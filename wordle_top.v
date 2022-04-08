@@ -1,57 +1,30 @@
 //////////////////////////////////////////////////////////////////////////////////
-// Author:			Brandon Franzke, Gandhi Puvvada, Bilal Zafar
-// Create Date:		02/17/2008, 2/6/2012, 9/4/2020, 2/8/2021
-// File Name:		ee354_numlock_top.v [EXERCISE given to students]
-// Description: 
-//
-//
-// Revision: 		2.2
-// Additional Comments: Students: Search for the "TODO" sections and complete them.
-//                                There are about eleven "TODO" sections.
+// Author: Kristian Bostic, Vy Ho
+// Create Date:	4/7/2022
+// File Name: wordle_top.v
+// Description: Top design for Wordle
 //////////////////////////////////////////////////////////////////////////////////
 
 `timescale 1ns / 1ps
 
 module ee354_numlock_top (   
 		MemOE, MemWR, RamCS, QuadSpiFlashCS, // Disable the three memory chips
-
-        ClkPort,                           // the 100 MHz incoming clock signal
-// TODO: Add below the buttons and Switches needed in this design	
-		// BtnL, BtnU, BtnD, BtnR,            // the Left, Up, Down, and the Right buttons 
-		BtnL, BtnR, //left and right buttons used for UNO and ZERO
-		BtnC,                             // the center button (this is our reset in most of our designs)
-		// Sw7, Sw6, Sw5, Sw4, Sw3, Sw2, Sw1, Sw0, // 8 switches
-		// Sw15, Sw14, Sw13, Sw12, Sw11, Sw10, Sw9, Sw8, Sw7, Sw6, Sw5, Sw4, Sw3, Sw2, Sw1, Sw0, // 16  switches
-		Sw0, Sw1, Sw2, Sw3, Sw4, Sw5, 
-		// Ld15, Ld14, Ld13, Ld12, Ld11, Ld10, Ld9, Ld8, // unused 8 LEDs
-		Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0, // used 8 LEDs
-		An7, An6, An5, An4, An3, An2, An1, An0,			       // 8 anodes
-		Ca, Cb, Cc, Cd, Ce, Cf, Cg,        // 7 cathodes
-		Dp                                 // Dot Point Cathode on SSDs
+        	ClkPort, // the 100 MHz incoming clock signal
+		BtnL, BtnR, BtnU, BtnD, BtnC, // left, right, up, down, and center buttons
+		// ADD VGA STUFF HERE
 	  );
 
 
 	/*  INPUTS */
 	// Clock & Reset I/O
-	input		ClkPort;	
-// TODO: DEFINE THE INPUTS (buttons and switches) you need for this project
-// make sure to add those to the ee354_numlock_top PORT list also!	
-	// Project Specific Inputs
-	input	BtnL, BtnR, BtnC;	
-	input	Sw0, Sw1, Sw2, Sw3, Sw4, Sw5; 
-	
+	input	ClkPort;
+	input	BtnL, BtnR, BtnU, BtnD, BtnC;
 	
 	/*  OUTPUTS */
 	// Control signals on Memory chips 	(to disable them)
 	output 	MemOE, MemWR, RamCS, QuadSpiFlashCS;
 	// Project Specific Outputs
-	// LEDs
-	output 	 Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0;
-	// SSD Outputs
-	output 	Ca, Cb, Cc, Cd, Ce, Cf, Cg, Dp;   
-	output 	 An7, An6, An5, An4, An3, An2, An1, An0;
-	
-	
+	// ADD VGA STUFF HERE
 	
 	/*  LOCAL SIGNALS */
 	wire			reset, ClkPort;
