@@ -1,16 +1,19 @@
+//To do 
+//wordle dictionary, finish transitions based on match 
+
 `timescale 1ns / 1ps
 
-module wordle_sm(Clk, reset, U, Z, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done, Unlock);
+module wordle_sm(Clk, reset, U, D, L, R, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done);
     /*  INPUTS */
 	// Clock & Reset
 	input Clk, reset;
-	input U, Z;
+	input U, D, L, R, C;
+	input curr_letter;  
 	
 	/*  OUTPUTS */
 	// store current state
 	reg [7:0] state;	
 	output q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done;
-	
 	assign {q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done} = state;
 	
 	// aliasing states with one-hot state encoding
@@ -24,56 +27,57 @@ module wordle_sm(Clk, reset, U, Z, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Do
 	   Q6G = 8'b00000010,
 	   QDONE = 8'b00000001;
     
-    // unlock output
-	output Unlock;
+	output win, lose; 
 	
-	// Timer synchronization
-	reg [3:0] Timerout_count;
-	wire Timerout;
-	assign Timerout = Timerout_count[0] * Timerout_count[1] * Timerout_count[2] * Timerout_count[3];
-    
+	reg [7:0] first_letter; 
+	reg [7:0] second_letter;
+	reg [7:0] third_letter; 
+	reg [7:0] fourth_letter; 
+	reg [7:0] fifth_letter; 
+	reg [3:0] I; //counter for the guess 
+	reg [3:0] J; //for wordle
+	
+	
+	
     // NSL AND SM
     always @ (posedge Clk, posedge reset)
 	begin
 	   if(reset) begin
 			state <= QI;
-			Timerout_count <= 4'bXXXX;
+			first_letter <= 8'bXXXXXXXX;
+		   	second_letter <= 8'bXXXXXXXX;
+		   	third_letter <= 8'bXXXXXXXX;
+		   	fourth_letter <= 8'bXXXXXXXX;
+		   	fifth_letter <= 8'bXXXXXXXX;
 	    end else begin
            case(state)
                QI: 
-                    if(U&&!Z) 
-                        state <= QG1GET;
-               QG1GET:
-                    if(!U) 
-                        state <= QG1;
-               QG1: 
-                    if(!U&&Z) 
-                        state <= QG10GET;
-                    else if(U==1)
-                        state <= QB;
-               QG10GET: 
-                    if(!Z) 
-                        state <= QG10;
-               QG10: 
-                    if(U&&!Z) 
-                        state <= QG101GET;
-                    else if(Z==1)
-                        state <= QB;
-               QG101GET: 
-                    if(!U) 
-                        state <= QG101;
-               QG101:
-                    if(U&&!Z) 
-                        state <= QG1011GET;
-                    else if(Z==1)
-                        state <= QB;
-               QG1011GET: 
-                    if(!U) 
-                        state <= QG1011;
-               QG1011: state <= QO;
-               QB: if(!U&&!Z) state <= QI;
-               QO: if(Timerout) state <= QI;
-			   default: state <= QI;
+		       if(C) 
+                        state <= Q1G;
+		       if 
+               Q1G:
+		       if(I==4) 
+		   	state <= Q2G; 
+          
+               Q2G: 
+		       if(I==4)
+		   	state <= Q3G; 
+               Q3G: 
+		       if(I==4)
+		   	state <= Q4G; 
+               Q4G: 
+		       if(I==4)
+		   	state <= Q5G; 
+               Q5G:
+		       if(I==4) 
+		   	state <= Q6G; 
+               Q6G:
+		       if(I==4) 
+		   	state <= QDONE; 
+               QDONE: 
+		       if(C)
+			state <= QI; 
+		default: state <= QI;
             endcase
         end
 	end
@@ -86,4 +90,6 @@ module wordle_sm(Clk, reset, U, Z, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Do
 	   else
 	        Timerout_count <= Timerout_count + 1;
 	end
+	
+	//assign win = 
 endmodule
