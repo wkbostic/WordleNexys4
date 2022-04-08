@@ -1,5 +1,6 @@
 //To do 
 //wordle dictionary, finish transitions based on match 
+//output
 
 `timescale 1ns / 1ps
 
