@@ -119,14 +119,15 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	     begin 
 		   case(state)
 		       QI: 
-			   if(C)  
-			   state <= Q1G;
-			   I <= 0; 
-			   first_letter <= 0; 
-			   second_letter <= 0;
-			   third_letter <= 0; 
-			   fourth_letter <= 0; 
-			   fifth_letter <= 0; 
+			       if(C) begin 
+				   state <= Q1G;
+				   I <= 0; 
+				   first_letter <= 0; 
+				   second_letter <= 0;
+				   third_letter <= 0; 
+				   fourth_letter <= 0; 
+				   fifth_letter <= 0;
+			       end 
 		       Q1G:
 			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
