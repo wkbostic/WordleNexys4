@@ -1,3 +1,22 @@
+//////////////////////////////////////////////////////////////////////////////////
+// Engineer: Kristian Bostic, Vy Ho
+// 
+// Create Date: 04/07/2022
+// Design Name: Wordle for Nexys4
+// Module Name: wordle_sm
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 //To do 
 //wordle dictionary, finish transitions based on match 
 //output
@@ -28,7 +47,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	   Q6G = 8'b00000010,
 	   QDONE = 8'b00000001;
     
-	output win, lose; 
+	output win, lose; //TO DO assign state
 	
 	reg [7:0] first_letter; 
 	reg [7:0] second_letter;
@@ -41,56 +60,50 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	
 	
     // NSL AND SM
-    always @ (posedge Clk, posedge reset)
+    	always @ (posedge Clk, posedge reset)
 	begin
-	   if(reset) begin
-			state <= QI;
-			first_letter <= 8'bXXXXXXXX;
-		   	second_letter <= 8'bXXXXXXXX;
-		   	third_letter <= 8'bXXXXXXXX;
-		   	fourth_letter <= 8'bXXXXXXXX;
-		   	fifth_letter <= 8'bXXXXXXXX;
-	    end else begin
-           case(state)
-               QI: 
-		       if(C) 
-                        state <= Q1G;
-		       if 
-               Q1G:
-		       if(I==4) 
-		   	state <= Q2G; 
-          
-               Q2G: 
-		       if(I==4)
-		   	state <= Q3G; 
-               Q3G: 
-		       if(I==4)
-		   	state <= Q4G; 
-               Q4G: 
-		       if(I==4)
-		   	state <= Q5G; 
-               Q5G:
-		       if(I==4) 
-		   	state <= Q6G; 
-               Q6G:
-		       if(I==4) 
-		   	state <= QDONE; 
-               QDONE: 
-		       if(C)
-			state <= QI; 
-		default: state <= QI;
-            endcase
-        end
-	end
-	
-	// Incrementing the timer
-	always @ (posedge Clk)
-	begin
-	   if(!q_Opening)
-			Timerout_count <= 0;
-	   else
-	        Timerout_count <= Timerout_count + 1;
-	end
+	   if(reset) 
+	     begin
+		state <= QI;
+		first_letter <= 8'bXXXXXXXX;
+		second_letter <= 8'bXXXXXXXX;
+		third_letter <= 8'bXXXXXXXX;
+		fourth_letter <= 8'bXXXXXXXX;
+		fifth_letter <= 8'bXXXXXXXX;
+	     end 
+	   else 
+	     begin
+		   case(state)
+		       QI: 
+			       if(C) 
+				state <= Q1G;
+			       if 
+		       Q1G:
+			       if(I==4) 
+				state <= Q2G; 
+
+		       Q2G: 
+			       if(I==4)
+				state <= Q3G; 
+		       Q3G: 
+			       if(I==4)
+				state <= Q4G; 
+		       Q4G: 
+			       if(I==4)
+				state <= Q5G; 
+		       Q5G:
+			       if(I==4) 
+				state <= Q6G; 
+		       Q6G:
+			       if(I==4) 
+				state <= QDONE; 
+		       QDONE: 
+			       if(C)
+				state <= QI; 
+			default: state <= QI;
+		   endcase
+             end
+     	end
 	
 	//assign win = 
 endmodule
