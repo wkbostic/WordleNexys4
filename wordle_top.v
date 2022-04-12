@@ -7,7 +7,7 @@
 
 `timescale 1ns / 1ps
 
-module ee354_numlock_top (   
+module wordle_top (   
 		MemOE, MemWR, RamCS, QuadSpiFlashCS, // Disable the three memory chips
         	ClkPort, // the 100 MHz incoming clock signal
 		BtnL, BtnR, BtnU, BtnD, BtnC, // left, right, up, down, and center buttons
@@ -35,6 +35,8 @@ module ee354_numlock_top (
 	wire			U, D, L, R, C;
 	wire 			curr_letter;  
 	wire 			q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done;
+	wire 			q_IKB, q_Run, q_DoneKB;
+	wire			curr_letter;
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
 	
@@ -85,10 +87,12 @@ module ee354_numlock_top (
 
 //------------
 // DESIGN
-	wordle_sm SM1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), .C(C), .q_I(q_I), 
+	wordle_sm SM1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .C(C), .curr_letter(curr_letter), .q_I(q_I), 
 		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done));	
 	
-
+	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), 
+			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(.q_DoneKB), .curr_letter(curr_letter));
+	
 	ee201_debouncer #(.N_dc(25)) ee201_debouncer_1, (.CLK(sys_clk), .RESET(reset), .PB(BtnC), .DPB( ), .SCEN(Start_Ack_SCEN), .MCEN( ), .CCEN( ));	
 	
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done )
