@@ -138,6 +138,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				  	state <= QDONE; 
 				else begin
 					state <= Q2G; 
+					//TODO: clear the _letter variables? 
 					I <= 0; 
 				end
 			   end 	
