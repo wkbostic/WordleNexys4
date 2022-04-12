@@ -49,17 +49,63 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
     
 	output win, lose; //TO DO assign state
 	
+	//twenty words, one to be selected as wordle of the day 
+	localparam
+	   word0 = "RENEW",
+	   word1 = "STOVE",
+  	   word2 = "EPOXY",
+	   word3 = "LAPSE", 
+  	   word4 = "BRINE", 
+	   word5 = "ROBOT", 
+  	   word6 = "AROMA", 
+	   word7 = "CRIMP", 
+  	   word8 = "BANAL", 
+	   word9 = "VIVID", 
+  	   word10 = "ULCER", 
+	   word11 = "ROBIN", 
+  	   word12 = "HAIKU", 
+	   word13 = "ENOKI", 
+  	   word14 = "CACAO", 
+	   word15 = "IDIOT", 
+  	   word16 = "ABBOT", 
+	   word17 = "AFOUL", 
+  	   word18 = "BUYER", 
+	   word19 = "MINUS";
+	
 	reg [7:0] first_letter; 
 	reg [7:0] second_letter;
 	reg [7:0] third_letter; 
 	reg [7:0] fourth_letter; 
 	reg [7:0] fifth_letter; 
-	reg [3:0] I; //counter for the guess 
-	reg [3:0] J; //for wordle
+	reg [39:0] randomWord; //5 ascii character word = 40 bits
 	
-	
-	
-    // NSL AND SM
+    	//Selecting Wordle of the Day
+	always @(posedge reset) begin: WordleOfDay
+		reg[4:0] randomNum //TO DO, might need another module to generate :/ 
+		case(randomNum)  
+			5'b00000: randomWord <= word0; 
+			5'b00001: randomWord <= word1; 
+			5'b00010: randomWord <= word2; 
+			5'b00011: randomWord <= word3; 
+			5'b00100: randomWord <= word4; 
+			5'b00101: randomWord <= word5; 
+			5'b00110: randomWord <= word6; 
+			5'b00111: randomWord <= word7; 
+			5'b01000: randomWord <= word8; 
+			5'b01001: randomWord <= word9; 
+			5'b01010: randomWord <= word10; 
+			5'b01011: randomWord <= word11; 
+			5'b01100: randomWord <= word12; 
+			5'b01101: randomWord <= word13; 
+			5'b01110: randomWord <= word14; 
+			5'b01111: randomWord <= word15; 
+			5'b10000: randomWord <= word16; 
+			5'b10001: randomWord <= word71; 
+			5'b10010: randomWord <= word18; 
+			5'b10011: randomWord <= word19; 
+		endcase
+	end
+    	// NSL AND SM
     	always @ (posedge Clk, posedge reset)
 	begin
 	   if(reset) 
