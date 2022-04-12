@@ -4,11 +4,11 @@
 
 `timescale 1ns / 1ps
 
-module wordle_sm(Clk, reset, Start, Ack U, D, L, R, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done);
+module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done);
     /*  INPUTS */
 	// Clock & Reset
 	input Clk, reset, Start, Ack;
-	input U, D, L, R, C;
+	input C;
 	input curr_letter;  
 	
 	/*  OUTPUTS */
