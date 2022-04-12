@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module wordle_keyboard(Clk, reset, Start, Ack U, D, L, R, q_I, q_Run, q_Done);
+module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, q_I, q_Run, q_Done, curr_letter);
     /*  INPUTS */
 	// Clock & Reset
 	input Clk, reset, Start, Ack;
