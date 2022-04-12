@@ -17,9 +17,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-//To do 
-//wordle dictionary, finish transitions based on match 
-//output
 
 `timescale 1ns / 1ps
 
@@ -47,7 +44,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	   Q6G = 8'b00000010,
 	   QDONE = 8'b00000001;
     
-	output win, lose; //TO DO assign state
+	output win, lose; 
 	
 	//twenty words, one to be selected as wordle of the day 
 	localparam
@@ -77,11 +74,12 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	reg [7:0] third_letter; 
 	reg [7:0] fourth_letter; 
 	reg [7:0] fifth_letter; 
+	reg [3:0] I; //counter to indicate position in guess, helps with state transition
 	reg [39:0] randomWord; //5 ascii character word = 40 bits
 	
     	//Selecting Wordle of the Day
-	always @(posedge reset) begin: WordleOfDay
-		reg[4:0] randomNum //TO DO, might need another module to generate :/ 
+	always @(posedge reset) begin: WordleOfDay //TODO trigger on posedge clock? at initial state?
+		reg[4:0] randomNum //TODO, might need another module to generate :/ 
 		case(randomNum)  
 			5'b00000: randomWord <= word0; 
 			5'b00001: randomWord <= word1; 
@@ -118,31 +116,42 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 		fifth_letter <= 8'bXXXXXXXX;
 	     end 
 	   else 
-	     begin
+	     begin 
 		   case(state)
 		       QI: 
-			       if(C) 
-				state <= Q1G;
-			       if 
+			   if(C)  
+			   state <= Q1G;
 		       Q1G:
-			       if(I==4) 
-				state <= Q2G; 
+			   I <= I + 1; 
+			   if (I==3'b000) //if I = 0
+				first_letter <= curr_letter;
+			   else if (I==3'b001) //if I = 1
+				second_letter <= curr_letter;
+			   else if (I==3'b010) //if I = 2 
+				third_letter <= curr_letter; 
+			   else if (I==3'b011) //if I = 3
+				fourth_letter <= curr_letter; 
+			   else begin //if I = 4 
+				fifth_letter = curr_letter; //TODO: blocking to save a clock?; else can make nonblocking and just check I == 5
+				if(first_letter==randomWord[39:32] && second_letter==randomWord[31:24] && third_letter==randomWord[23:16] 
+				  && fourth_letter==randomWord[15:8] && fifth_letter==randomWord[7:0])
+				  	state <= QDONE; 
+				else begin
+					state <= Q2G; 
+					I <= 0; 
+				end
+			   end 	
 
 		       Q2G: 
-			       if(I==4)
-				state <= Q3G; 
+ 
 		       Q3G: 
-			       if(I==4)
-				state <= Q4G; 
+
 		       Q4G: 
-			       if(I==4)
-				state <= Q5G; 
+
 		       Q5G:
-			       if(I==4) 
-				state <= Q6G; 
+
 		       Q6G:
-			       if(I==4) 
-				state <= QDONE; 
+
 		       QDONE: 
 			       if(C)
 				state <= QI; 
@@ -151,5 +160,8 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
              end
      	end
 	
-	//assign win = 
+	assign win = q_Done*(first_letter==randomWord[39:32])*(second_letter==randomWord[31:24])*(third_letter==randomWord[23:16])
+		     *(fourth_letter==randomWord[15:8])*(fifth_letter==randomWord[7:0]);
+	assign lose = q_Done*~((first_letter==randomWord[39:32])*(second_letter==randomWord[31:24])*(third_letter==randomWord[23:16])
+		     *(fourth_letter==randomWord[15:8])*(fifth_letter==randomWord[7:0])); 
 endmodule
