@@ -61,12 +61,12 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
   	   word10 = "ULCER", 
 	   word11 = "ROBIN", 
   	   word12 = "HAIKU", 
-	   word13 = "ENOKI", 
+	   word13 = "GRIME", 
   	   word14 = "CACAO", 
-	   word15 = "IDIOT", 
+	   word15 = "ONION", 
   	   word16 = "ABBOT", 
-	   word17 = "AFOUL", 
-  	   word18 = "BUYER", 
+	   word17 = "WALTZ", 
+  	   word18 = "AGLET",
 	   word19 = "MINUS";
 	
 	reg [7:0] first_letter; 
@@ -78,8 +78,8 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	reg [39:0] randomWord; //5 ascii character word = 40 bits
 	
     	//Selecting Wordle of the Day
-	always @(posedge reset) begin: WordleOfDay //TODO trigger on posedge clock? at initial state?
-		reg[4:0] randomNum //TODO, might need another module to generate :/ 
+	always @(q_I) begin: WordleOfDay //Selects one of the 20 words to be Wordle of the day during Initial State 
+		reg[4:0] randomNum; //TODO 
 		case(randomNum)  
 			5'b00000: randomWord <= word0; 
 			5'b00001: randomWord <= word1; 
@@ -98,7 +98,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 			5'b01110: randomWord <= word14; 
 			5'b01111: randomWord <= word15; 
 			5'b10000: randomWord <= word16; 
-			5'b10001: randomWord <= word71; 
+			5'b10001: randomWord <= word17; 
 			5'b10010: randomWord <= word18; 
 			5'b10011: randomWord <= word19; 
 		endcase
@@ -121,6 +121,12 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 		       QI: 
 			   if(C)  
 			   state <= Q1G;
+			   I <= 0; 
+			   first_letter <= 0; 
+			   second_letter <= 0;
+			   third_letter <= 0; 
+			   fourth_letter <= 0; 
+			   fifth_letter <= 0; 
 		       Q1G:
 			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
@@ -132,37 +138,137 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 			   else if (I==3'b011) //if I = 3
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
-				fifth_letter = curr_letter; //TODO: blocking to save a clock?; else can make nonblocking and just check I == 5
-				if(first_letter==randomWord[39:32] && second_letter==randomWord[31:24] && third_letter==randomWord[23:16] 
-				  && fourth_letter==randomWord[15:8] && fifth_letter==randomWord[7:0])
+				fifth_letter = curr_letter; 
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q2G; 
-					//TODO: clear the _letter variables? 
+					first_letter <= 0; 
+					second_letter <= 0; 
+					third_letter <= 0; 
+					fourth_letter <= 0; 
+					fifth_letter <= 0; 
 					I <= 0; 
 				end
 			   end 	
-
 		       Q2G: 
- 
+ 			   I <= I + 1; 
+			   if (I==3'b000) //if I = 0
+				first_letter <= curr_letter;
+			   else if (I==3'b001) //if I = 1
+				second_letter <= curr_letter;
+			   else if (I==3'b010) //if I = 2 
+				third_letter <= curr_letter; 
+			   else if (I==3'b011) //if I = 3
+				fourth_letter <= curr_letter; 
+			   else begin //if I = 4 
+				fifth_letter = curr_letter; 
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				  	state <= QDONE; 
+				else begin
+					state <= Q3G; 
+					first_letter <= 0; 
+					second_letter <= 0; 
+					third_letter <= 0; 
+					fourth_letter <= 0; 
+					fifth_letter <= 0; 
+					I <= 0; 
+				end
+			   end 	
 		       Q3G: 
-
+ 			   I <= I + 1; 
+			   if (I==3'b000) //if I = 0
+				first_letter <= curr_letter;
+			   else if (I==3'b001) //if I = 1
+				second_letter <= curr_letter;
+			   else if (I==3'b010) //if I = 2 
+				third_letter <= curr_letter; 
+			   else if (I==3'b011) //if I = 3
+				fourth_letter <= curr_letter; 
+			   else begin //if I = 4 
+				fifth_letter = curr_letter; 
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				  	state <= QDONE; 
+				else begin
+					state <= Q4G; 
+					first_letter <= 0; 
+					second_letter <= 0; 
+					third_letter <= 0; 
+					fourth_letter <= 0; 
+					fifth_letter <= 0; 
+					I <= 0; 
+				end
+			   end
 		       Q4G: 
-
+ 			   I <= I + 1; 
+			   if (I==3'b000) //if I = 0
+				first_letter <= curr_letter;
+			   else if (I==3'b001) //if I = 1
+				second_letter <= curr_letter;
+			   else if (I==3'b010) //if I = 2 
+				third_letter <= curr_letter; 
+			   else if (I==3'b011) //if I = 3
+				fourth_letter <= curr_letter; 
+			   else begin //if I = 4 
+				fifth_letter = curr_letter; 
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				  	state <= QDONE; 
+				else begin
+					state <= Q5G; 
+					first_letter <= 0; 
+					second_letter <= 0; 
+					third_letter <= 0; 
+					fourth_letter <= 0; 
+					fifth_letter <= 0; 
+					I <= 0; 
+				end
+			   end
 		       Q5G:
-
+ 			   I <= I + 1; 
+			   if (I==3'b000) //if I = 0
+				first_letter <= curr_letter;
+			   else if (I==3'b001) //if I = 1
+				second_letter <= curr_letter;
+			   else if (I==3'b010) //if I = 2 
+				third_letter <= curr_letter; 
+			   else if (I==3'b011) //if I = 3
+				fourth_letter <= curr_letter; 
+			   else begin //if I = 4 
+				fifth_letter = curr_letter; 
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				  	state <= QDONE; 
+				else begin
+					state <= Q6G; 
+					first_letter <= 0; 
+					second_letter <= 0; 
+					third_letter <= 0; 
+					fourth_letter <= 0; 
+					fifth_letter <= 0; 
+					I <= 0; 
+				end
+			   end
 		       Q6G:
-
+ 			   I <= I + 1; 
+			   if (I==3'b000) //if I = 0
+				first_letter <= curr_letter;
+			   else if (I==3'b001) //if I = 1
+				second_letter <= curr_letter;
+			   else if (I==3'b010) //if I = 2 
+				third_letter <= curr_letter; 
+			   else if (I==3'b011) //if I = 3
+				fourth_letter <= curr_letter; 
+			   else begin //if I = 4 
+				fifth_letter <= curr_letter;
+				state <= QDONE; 
+			   end
 		       QDONE: 
-			       if(C)
+			   if(C)
 				state <= QI; 
 			default: state <= QI;
 		   endcase
              end
      	end
 	
-	assign win = q_Done*(first_letter==randomWord[39:32])*(second_letter==randomWord[31:24])*(third_letter==randomWord[23:16])
-		     *(fourth_letter==randomWord[15:8])*(fifth_letter==randomWord[7:0]);
-	assign lose = q_Done*~((first_letter==randomWord[39:32])*(second_letter==randomWord[31:24])*(third_letter==randomWord[23:16])
-		     *(fourth_letter==randomWord[15:8])*(fifth_letter==randomWord[7:0])); 
+	assign win = q_Done*({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord);
+	assign lose = q_Done*~({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord); 
 endmodule
