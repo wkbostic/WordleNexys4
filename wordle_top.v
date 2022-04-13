@@ -13,7 +13,7 @@ module wordle_top (
 		BtnL, BtnR, BtnU, BtnD, BtnC, // left, right, up, down, and center buttons
 		Sw0, // Used for reset since no buttons left
 		//Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0, // LEDs for displaying state on Nexys4
-		vga_h_sync, vga_v_sync, vga_r, vga_g, vga_b //TODO: ADD VGA STUFF HERE
+		vga_h_sync, vga_v_sync, vga_r, vga_g, vga_b 
 	  );
 
 
@@ -83,7 +83,7 @@ module wordle_top (
 	always @ (posedge board_clk, posedge reset)  
 	begin : CLOCK_DIVIDER
 	if (reset)
-			DIV_CLK <= 0;
+		DIV_CLK <= 0;
 	else
 		DIV_CLK <= DIV_CLK + 1'b1;
 	end		
@@ -138,7 +138,7 @@ module wordle_top (
 		begin 
 			if (guessWord == randomWord) 
 			begin
-				G = CounterX>100 && CounterX<200 && CounterY[5:3]==7; //TODO: change 
+				G = CounterX>100 && CounterX<200 && CounterY[5:3]==7; //TODO: change to right square dimensions
 				R = 0; 
 				B = 0; 
 			end
