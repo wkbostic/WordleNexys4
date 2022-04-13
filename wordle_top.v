@@ -13,7 +13,7 @@ module wordle_top (
 		BtnL, BtnR, BtnU, BtnD, BtnC, // left, right, up, down, and center buttons
 		Sw0, // Used for reset since no buttons left
 		Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0, // LEDs for displaying state on Nexys4
-		// ADD VGA STUFF HERE
+		vga_h_sync, vga_v_sync, vga_r, vga_g, vga_b //TODO: ADD VGA STUFF HERE
 	  );
 
 
@@ -27,7 +27,8 @@ module wordle_top (
 	// Control signals on Memory chips 	(to disable them)
 	output 	MemOE, MemWR, RamCS, QuadSpiFlashCS;
 	// Project Specific Outputs
-	// ADD VGA STUFF HERE
+	output vga_h_sync, vga_v_sync, vga_r, vga_g, vga_b; 
+	// TODO: ADD VGA STUFF HERE
 	
 	/*  LOCAL SIGNALS */
 	wire			reset, ClkPort;
@@ -40,6 +41,11 @@ module wordle_top (
 	wire 			win, lose; 
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
+	wire[9:0] 		CounterX; 
+	wire[9:0] 		CounterY; 
+	wire			inDisplayArea; 
+	reg			vga_r, vga_g, vga_b; 
+
 	
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
@@ -96,6 +102,8 @@ module wordle_top (
 	
 	ee201_debouncer #(.N_dc(25)) ee201_debouncer_1 (.CLK(sys_clk), .RESET(reset), .PB(BtnC), .DPB( ), .SCEN(Start_Ack_SCEN), .MCEN( ), .CCEN( ));	
 	
+	hvsync_generator syncgen(.clk(clk), .reset(reset),.vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync), .inDisplayArea(inDisplayArea), .CounterX(CounterX), .CounterY(CounterY));
+
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done )
 	begin : OUTPUT_STATE_AS_STRING
 		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
@@ -118,8 +126,16 @@ module wordle_top (
 	assign {Ld3, Ld2, Ld1, Ld0} = {BtnL, BtnU, BtnR, BtnD}; // Reset is driven by BtnC
 	
 //------------
-// OUTPUT: VGA Display
-
+// TODO: OUTPUT: VGA Display
+	always @ (q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done) begin: VGA_DISPLAY
+		if (~q_Done)
+			//
+			
+		else
+		
+	
+	end
+		
 	
 endmodule
 
