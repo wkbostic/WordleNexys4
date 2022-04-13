@@ -25,13 +25,33 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	// Clock & Reset
 	input Clk, reset, Start, Ack;
 	input C;
-	input curr_letter;  
 	
 	/*  OUTPUTS */
 	// store current state
 	reg [7:0] state;	
 	output q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done;
 	assign {q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done} = state;
+	
+	// Output to be used by top design 
+	output win, lose;
+	assign win = q_Done*(guessWord == randomWord);
+	assign lose = q_Done*~(guessWord == randomWord); 
+	output guessWord; 
+	
+	// Local variables, dealing with current guess 
+	reg [7:0] first_letter; 
+	reg [7:0] second_letter;
+	reg [7:0] third_letter; 
+	reg [7:0] fourth_letter; 
+	reg [7:0] fifth_letter; 
+	reg [39:0] guessWord; 
+	assign {first_letter, second_letter, third_letter, fourth_letter, fifth_letter} = guessWord; 
+	reg [3:0] I; //counter to indicate position in guess, helps with state transition 
+	wire curr_letter; //taken from keyboard 
+	
+	// Variables dealing with selecting Wordle of the Day 
+	reg [39:0] randomWord; //5 ascii character word = 40 bits
+	wire rnd; //random number 
 	
 	// aliasing states with one-hot state encoding
 	localparam
@@ -42,9 +62,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	   Q4G = 8'b00001000,
 	   Q5G = 8'b00000100,
 	   Q6G = 8'b00000010,
-	   QDONE = 8'b00000001;
-    
-	output win, lose; 
+	   QDONE = 8'b00000001; 
 	
 	//twenty words, one to be selected as wordle of the day 
 	localparam
@@ -69,17 +87,9 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
   	   word18 = "AGLET",
 	   word19 = "MINUS";
 	
-	//Local variables
-	reg [7:0] first_letter; 
-	reg [7:0] second_letter;
-	reg [7:0] third_letter; 
-	reg [7:0] fourth_letter; 
-	reg [7:0] fifth_letter; 
-	reg [3:0] I; //counter to indicate position in guess, helps with state transition
-	reg [39:0] randomWord; //5 ascii character word = 40 bits
-	wire rnd; //random number 
-	
 	LFSR RAN1(.rnd(rnd));
+	
+	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .curr_letter(curr_letter));
 	
     	//Selecting Wordle of the Day
 	always @(q_I) begin: WordleOfDay //Selects one of the 20 words to be Wordle of the day during Initial State 
@@ -148,7 +158,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				   if(guessWord == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q2G; 
@@ -174,7 +184,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				   if(guessWord == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q3G; 
@@ -200,7 +210,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				   if(guessWord == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q4G; 
@@ -226,7 +236,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				   if(guessWord == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q5G; 
@@ -252,7 +262,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+				   if(guessWord == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q6G; 
@@ -288,7 +298,5 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 		   endcase
              end
      	end
-	
-	assign win = q_Done*({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord);
-	assign lose = q_Done*~({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord); 
+
 endmodule
