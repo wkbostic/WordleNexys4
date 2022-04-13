@@ -12,7 +12,7 @@ module wordle_top (
         	ClkPort, // the 100 MHz incoming clock signal
 		BtnL, BtnR, BtnU, BtnD, BtnC, // left, right, up, down, and center buttons
 		Sw0, // Used for reset since no buttons left
-		Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0, // LEDs for displaying state on Nexys4
+		//Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0, // LEDs for displaying state on Nexys4
 		vga_h_sync, vga_v_sync, vga_r, vga_g, vga_b //TODO: ADD VGA STUFF HERE
 	  );
 
@@ -39,6 +39,9 @@ module wordle_top (
 	wire 			q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done;
 	wire 			q_IKB, q_Run, q_DoneKB;
 	wire 			win, lose; 
+	reg [39:0] 		guessWord;	
+	reg [39:0] 		randomWord;
+	reg [3:0] 		I;
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
 	//VGA Display 
@@ -46,7 +49,9 @@ module wordle_top (
 	wire[9:0] 		CounterY; 
 	wire			inDisplayArea; 
 	reg			vga_r, vga_g, vga_b; 
-	reg[9:0] 		position;
+	wire 			R; 
+	wire			G;
+	wire			B;
 	
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
@@ -95,7 +100,7 @@ module wordle_top (
 //------------
 // DESIGN
 	wordle_sm SM1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .C(C), .curr_letter(curr_letter), .q_I(q_I), 
-		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(lose));	
+		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(lose), .randomWord(randomWord), .guessWord(guessWord), .I(I));	
 	
 	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), 
 			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(q_DoneKB), .curr_letter(curr_letter));
@@ -122,21 +127,30 @@ module wordle_top (
 //------------
 // OUTPUT: LED
 	
-	assign {Ld7, Ld6, Ld5, Ld4} = {q_I, q_Sub, q_Mult, q_Done};
-	assign {Ld3, Ld2, Ld1, Ld0} = {BtnL, BtnU, BtnR, BtnD}; // Reset is driven by BtnC
+	//assign {Ld7, Ld6, Ld5, Ld4} = {q_I, q_Sub, q_Mult, q_Done};
+	//assign {Ld3, Ld2, Ld1, Ld0} = {BtnL, BtnU, BtnR, BtnD}; // Reset is driven by BtnC
 	
 //------------
 // OUTPUT: VGA Display
-	
-			//if the guess is the same as the wordle of the day -> output all green squares 
-			//else check each letter one by one: if (first letter == (letter1 or...letter2...etc)&&(first letter != letter1) -> then output yellow square? 
-				//is there a better way to do this
-			//else cry 
+	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done ) 
+	begin: VGA_DISPLAY
+		if (C&&(I==4)) //fifth letter entered
+		begin 
+			if (guessWord == randomWord) 
+			begin
+				G = CounterX>100 && CounterX<200 && CounterY[5:3]==7; //TODO: change 
+				R = 0; 
+				B = 0; 
+			end
+			//else if any of the letters match any of the letters in randomWord
+			
+		end
+	end
+
 
 	
 	//figure out dimensions for the squares here 
 	wire R = CounterY>=(position-10) && CounterY<=(position+10) && CounterX[8:5]==7;
-	wire G = CounterX>100 && CounterX<200 && CounterY[5:3]==7;
 	wire B = 0;
 		
 	always @(posedge clk) begin
