@@ -11,6 +11,7 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done
     output curr_letter;
 	// store current state
 	output q_I, q_Run, q_Done;
+	reg[2:0] = state; 
 	assign {q_I, q_Run, q_Done} = state;
 	
 	// aliasing states with one-hot state encoding
