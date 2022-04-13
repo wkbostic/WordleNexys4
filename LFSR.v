@@ -1,13 +1,16 @@
+//from website https://simplefpga.blogspot.com/2013/02/random-number-generator-in-verilog-fpga.html
+
 module LFSR (
     input clock,
     input reset,
     output [12:0] rnd 
     );
 
-wire feedback = random[12] ^ random[3] ^ random[2] ^ random[0]; 
 
 reg [12:0] random, random_next, random_done;
 reg [3:0] count, count_next; //to keep track of the shifts
+wire feedback = random[12] ^ random[3] ^ random[2] ^ random[0]; 
+
 
 always @ (posedge clock or posedge reset)
 begin
