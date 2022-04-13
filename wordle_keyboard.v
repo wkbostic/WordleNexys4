@@ -1,10 +1,10 @@
 `timescale 1ns / 1ps
 
-module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, q_I, q_Run, q_Done, curr_letter);
+module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done, curr_letter, done);
     /*  INPUTS */
 	// Clock & Reset
 	input Clk, reset, Start, Ack;
-	input U, D, L, R;
+	input U, D, L, R, C;
 	input done;  
 	
 	/*  OUTPUTS */
@@ -38,16 +38,18 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, q_I, q_Run, q_Done, c
                    if(Start)
                        state <= QRUN;
                QRUN: 
-                   if(done)
+                   begin
+		    if(done)
                        state <= QDONE;
-                   if(BtnU && row != 0)
+                    if(U && row != 0)
                        row <= row - 1;
-                   else if(BtnD && row != 2)
+                    else if(D && row != 2)
                        row <= row + 1;
-                   else if(BtnL && col != 0)
+		    else if(L && col != 0)
                        col <= col -1;
-                   else if(BtnC && (row == 2 && col != 7 || row != 2 && col != 9))
+                    else if(C && (row == 2 && col != 7 || row != 2 && col != 9))
                        col <= col + 1;
+		   end
                QDONE: 
                    if(Ack)
                        state <= QI;
