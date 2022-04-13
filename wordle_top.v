@@ -41,16 +41,16 @@ module wordle_top (
 	wire 			win, lose; 
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
+	//VGA Display 
 	wire[9:0] 		CounterX; 
 	wire[9:0] 		CounterY; 
 	wire			inDisplayArea; 
 	reg			vga_r, vga_g, vga_b; 
-
+	reg[9:0] 		position;
 	
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
-	
 	
 //------------
 // CLOCK DIVISION
@@ -126,17 +126,23 @@ module wordle_top (
 	assign {Ld3, Ld2, Ld1, Ld0} = {BtnL, BtnU, BtnR, BtnD}; // Reset is driven by BtnC
 	
 //------------
-// TODO: OUTPUT: VGA Display
-	always @ (q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done) begin: VGA_DISPLAY
-		if (~q_Done)
+// OUTPUT: VGA Display
+	//change position everytime letter is entered
 			//if the guess is the same as the wordle of the day -> output all green squares 
 			//else check each letter one by one: if (first letter == (letter1 or...letter2...etc)&&(first letter != letter1) -> then output yellow square? 
 				//is there a better way to do this
 			//else cry 
-			
-		else
-		
+
 	
+	//figure out dimensions for the squares here 
+	wire R = CounterY>=(position-10) && CounterY<=(position+10) && CounterX[8:5]==7;
+	wire G = CounterX>100 && CounterX<200 && CounterY[5:3]==7;
+	wire B = 0;
+		
+	always @(posedge clk) begin
+		vga_r <= R & inDisplayArea;
+		vga_g <= G & inDisplayArea;
+		vga_b <= B & inDisplayArea;
 	end
 		
 	
