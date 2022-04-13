@@ -20,7 +20,7 @@
 
 `timescale 1ns / 1ps
 
-module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done);
+module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done, win, lose);
     /*  INPUTS */
 	// Clock & Reset
 	input Clk, reset, Start, Ack;
@@ -119,6 +119,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	     begin 
 		   case(state)
 		       QI: 
+			 begin
 			       if(C) begin 
 				   state <= Q1G;
 				   I <= 0; 
@@ -128,7 +129,9 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				   fourth_letter <= 0; 
 				   fifth_letter <= 0;
 			       end 
+			 end
 		       Q1G:
+			 begin
 			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
@@ -151,9 +154,11 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 					fifth_letter <= 0; 
 					I <= 0; 
 				end
-			   end 	
+			   end 
+			  end
 		       Q2G: 
- 			   I <= I + 1; 
+ 			 begin
+			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -175,9 +180,11 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 					fifth_letter <= 0; 
 					I <= 0; 
 				end
-			   end 	
+			   end 
+			 end
 		       Q3G: 
- 			   I <= I + 1; 
+ 			  begin
+			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -200,8 +207,10 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 					I <= 0; 
 				end
 			   end
+			  end
 		       Q4G: 
- 			   I <= I + 1; 
+ 			  begin
+			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -224,8 +233,10 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 					I <= 0; 
 				end
 			   end
+			  end
 		       Q5G:
- 			   I <= I + 1; 
+ 			   begin
+			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -248,8 +259,9 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 					I <= 0; 
 				end
 			   end
+			  end
 		       Q6G:
- 			   I <= I + 1; 
+			   //I <= I + 1; 
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -261,6 +273,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 			   else begin //if I = 4 
 				fifth_letter <= curr_letter;
 				state <= QDONE; 
+				   I <= I + 1;
 			   end
 		       QDONE: 
 			   if(C)
