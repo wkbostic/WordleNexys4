@@ -21,6 +21,7 @@ module wordle_top (
 	// Clock & Reset I/O
 	input	ClkPort;
 	input	BtnL, BtnR, BtnU, BtnD, BtnC;
+	input Sw0; 
 	
 	/*  OUTPUTS */
 	// Control signals on Memory chips 	(to disable them)
@@ -91,9 +92,9 @@ module wordle_top (
 		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done));	
 	
 	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), 
-			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(.q_DoneKB), .curr_letter(curr_letter));
+			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(q_DoneKB), .curr_letter(curr_letter));
 	
-	ee201_debouncer #(.N_dc(25)) ee201_debouncer_1, (.CLK(sys_clk), .RESET(reset), .PB(BtnC), .DPB( ), .SCEN(Start_Ack_SCEN), .MCEN( ), .CCEN( ));	
+	ee201_debouncer #(.N_dc(25)) ee201_debouncer_1 (.CLK(sys_clk), .RESET(reset), .PB(BtnC), .DPB( ), .SCEN(Start_Ack_SCEN), .MCEN( ), .CCEN( ));	
 	
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done )
 	begin : OUTPUT_STATE_AS_STRING
