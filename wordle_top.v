@@ -148,10 +148,7 @@ module wordle_top (
 	end
 
 
-	
-	//figure out dimensions for the squares here 
-	wire R = CounterY>=(position-10) && CounterY<=(position+10) && CounterX[8:5]==7;
-	wire B = 0;
+
 		
 	always @(posedge clk) begin
 		vga_r <= R & inDisplayArea;
