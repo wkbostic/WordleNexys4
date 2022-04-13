@@ -69,6 +69,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
   	   word18 = "AGLET",
 	   word19 = "MINUS";
 	
+	//Local variables
 	reg [7:0] first_letter; 
 	reg [7:0] second_letter;
 	reg [7:0] third_letter; 
@@ -76,12 +77,14 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	reg [7:0] fifth_letter; 
 	reg [3:0] I; //counter to indicate position in guess, helps with state transition
 	reg [39:0] randomWord; //5 ascii character word = 40 bits
+	wire rnd; //random number 
 	
 	LFSR RAN1(.rnd(rnd));
 	
     	//Selecting Wordle of the Day
 	always @(q_I) begin: WordleOfDay //Selects one of the 20 words to be Wordle of the day during Initial State 
 		reg[4:0] randomNum; //TODO 
+		randomNum = rnd; 
 		case(randomNum)  
 			5'b00000: randomWord <= word0; 
 			5'b00001: randomWord <= word1; 
