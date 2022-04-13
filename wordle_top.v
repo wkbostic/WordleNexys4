@@ -12,7 +12,7 @@ module wordle_top (
         	ClkPort, // the 100 MHz incoming clock signal
 		BtnL, BtnR, BtnU, BtnD, BtnC, // left, right, up, down, and center buttons
 		Sw0, // Used for reset since no buttons left
-		//Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0, // LEDs for displaying state on Nexys4
+		Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0, // LEDs for displaying state on Nexys4
 		// ADD VGA STUFF HERE
 	  );
 
