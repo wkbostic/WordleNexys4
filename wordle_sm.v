@@ -261,6 +261,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 			   end
 			  end
 		       Q6G:
+			 begin
 			   I <= I + 1; 
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
@@ -274,6 +275,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fifth_letter <= curr_letter;
 				state <= QDONE; 
 			   end
+			 end
 		       QDONE: 
 			   if(C)
 				state <= QI; 
