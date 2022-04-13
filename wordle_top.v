@@ -127,7 +127,7 @@ module wordle_top (
 	
 //------------
 // OUTPUT: VGA Display
-	//change position everytime letter is entered
+	
 			//if the guess is the same as the wordle of the day -> output all green squares 
 			//else check each letter one by one: if (first letter == (letter1 or...letter2...etc)&&(first letter != letter1) -> then output yellow square? 
 				//is there a better way to do this
