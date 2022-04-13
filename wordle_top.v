@@ -129,7 +129,10 @@ module wordle_top (
 // TODO: OUTPUT: VGA Display
 	always @ (q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done) begin: VGA_DISPLAY
 		if (~q_Done)
-			//
+			//if the guess is the same as the wordle of the day -> output all green squares 
+			//else check each letter one by one: if (first letter == (letter1 or...letter2...etc)&&(first letter != letter1) -> then output yellow square? 
+				//is there a better way to do this
+			//else cry 
 			
 		else
 		
