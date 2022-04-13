@@ -38,7 +38,6 @@ module wordle_top (
 	wire 			q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done;
 	wire 			q_IKB, q_Run, q_DoneKB;
 	wire 			win, lose; 
-	wire			curr_letter;
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
 	
@@ -90,7 +89,7 @@ module wordle_top (
 //------------
 // DESIGN
 	wordle_sm SM1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .C(C), .curr_letter(curr_letter), .q_I(q_I), 
-		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(.lose));	
+		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(lose));	
 	
 	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), 
 			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(q_DoneKB), .curr_letter(curr_letter));
