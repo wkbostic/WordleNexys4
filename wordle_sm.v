@@ -35,15 +35,14 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	
 	// Output to be used by top design 
 	output win, lose;
-	assign win = q_Done*(guessWord == randomWord);
-	assign lose = q_Done*~(guessWord == randomWord); 
-	output guessWord; 
+	output first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
+	assign win = q_Done*({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord);
+	assign lose = q_Done*~({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord); 
 	output randomWord; 
 	output I; 
 	
 	// Local variables, dealing with current guess 
 	reg [7:0] first_letter, second_letter, third_letter, fourth_letter, fifth_letter; 
-	output first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
 	reg [3:0] I; //counter to indicate position in guess, helps with state transition 
 	wire curr_letter; //taken from keyboard 
 	
