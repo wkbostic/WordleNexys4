@@ -20,7 +20,7 @@
 
 `timescale 1ns / 1ps
 
-module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done, win, lose, first_letter, second_letter,
+module wordle_sm(Clk, reset, Start, Ack, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done, win, lose, first_letter, second_letter,
 		 third_letter, fourth_letter, fifth_letter, randomWord, I);
     /*  INPUTS */
 	// Clock & Reset
@@ -36,8 +36,6 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	// Output to be used by top design 
 	output win, lose;
 	output first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
-	assign win = q_Done*({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord);
-	assign lose = q_Done*~({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord); 
 	output randomWord; 
 	output I; 
 	
@@ -49,6 +47,9 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	// Variables dealing with selecting Wordle of the Day 
 	reg [39:0] randomWord; //5 ascii character word = 40 bits
 	wire rnd; //random number 
+	
+	assign win = q_Done*({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord);
+	assign lose = q_Done*~({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord); 
 	
 	// aliasing states with one-hot state encoding
 	localparam
