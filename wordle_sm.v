@@ -44,8 +44,6 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	// Local variables, dealing with current guess 
 	reg [7:0] first_letter, second_letter, third_letter, fourth_letter, fifth_letter; 
 	output first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
-	reg [39:0] guessWord; 
-	assign {first_letter, second_letter, third_letter, fourth_letter, fifth_letter} = guessWord; 
 	reg [3:0] I; //counter to indicate position in guess, helps with state transition 
 	wire curr_letter; //taken from keyboard 
 	
@@ -158,7 +156,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if(guessWord == randomWord)
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q2G; 
@@ -184,7 +182,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if(guessWord == randomWord)
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q3G; 
@@ -210,7 +208,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if(guessWord == randomWord)
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q4G; 
@@ -236,7 +234,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if(guessWord == randomWord)
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q5G; 
@@ -262,7 +260,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 				fourth_letter <= curr_letter; 
 			   else begin //if I = 4 
 				fifth_letter = curr_letter; 
-				   if(guessWord == randomWord)
+				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
 				  	state <= QDONE; 
 				else begin
 					state <= Q6G; 
