@@ -20,7 +20,8 @@
 
 `timescale 1ns / 1ps
 
-module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done, win, lose, guessWord, randomWord, I);
+module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done, win, lose, first_letter, second_letter,
+		 third_letter, fourth_letter, fifth_letter, randomWord, I);
     /*  INPUTS */
 	// Clock & Reset
 	input Clk, reset, Start, Ack;
@@ -41,11 +42,8 @@ module wordle_sm(Clk, reset, Start, Ack, C, curr_letter, q_I, q_1G, q_2G, q_3G, 
 	output I; 
 	
 	// Local variables, dealing with current guess 
-	reg [7:0] first_letter; 
-	reg [7:0] second_letter;
-	reg [7:0] third_letter; 
-	reg [7:0] fourth_letter; 
-	reg [7:0] fifth_letter; 
+	reg [7:0] first_letter, second_letter, third_letter, fourth_letter, fifth_letter; 
+	output first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
 	reg [39:0] guessWord; 
 	assign {first_letter, second_letter, third_letter, fourth_letter, fifth_letter} = guessWord; 
 	reg [3:0] I; //counter to indicate position in guess, helps with state transition 
