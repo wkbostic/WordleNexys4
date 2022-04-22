@@ -55,7 +55,7 @@ module wordle_top (
 	wire			Blue;
 	wire [2:0] 		row; 
 	wire [2:0]		column; 
-	reg [2:0]		color_array[0:5][0:4]; //an array with 6 rows and 5 columns, each of size 3-bit
+	reg [2:0]		color_array[0:5][0:4]; //an array with 6 rows and 5 columns, each of size 3-bit in the order: Red, Green, Blue
 	
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
@@ -209,9 +209,9 @@ module wordle_top (
 	
 		
 	always @(posedge clk) begin
-		vga_r <= Red & inDisplayArea;
-		vga_g <= Green & inDisplayArea;
-		vga_b <= Blue & inDisplayArea;
+		vga_r <= color_array[row][column][1] & inDisplayArea;
+		vga_g <= color_array[row][column][2] & inDisplayArea;
+		vga_b <= color_array[row][column][3] & inDisplayArea;
 	end
 		
 	
