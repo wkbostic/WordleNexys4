@@ -166,12 +166,19 @@ module wordle_top (
 //------------
 // OUTPUT: VGA Display	
 	localparam
-		positionX = 31, 
-		positionY = 19, 
-		stepX = 8, 
-		stepY = 8, 
-		sizeX = 40,
-		sizeY = 40; 
+		positionX_g = , 
+		positionY_g = , 
+		stepX_g = 8, 
+		stepY_g = 8, 
+		sizeX_g = 40,
+		sizeY_g = 40,
+	
+		positionX_kb = 112, 
+		positionY_kb = 322, 
+		stepX_kb = 40, 
+		stepY_kb = , 
+		sizeX_kb = , 
+		sizeY_kb = ; 
 	
 	always @ ( negedge q_I, negedge q_1G, negedge q_2G, negedge q_3G, negedge q_4G, negedge q_5G, negedge q_6G, negedge q_Done ) //changing positionX and positionY
 	begin: VGA_DISPLAY
