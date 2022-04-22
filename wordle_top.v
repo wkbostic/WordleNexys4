@@ -173,7 +173,7 @@ module wordle_top (
 		sizeX = 40,
 		sizeY = 40; 
 	
-	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done ) //changing positionX and positionY
+	always @ ( negedge q_I, negedge q_1G, negedge q_2G, negedge q_3G, negedge q_4G, negedge q_5G, negedge q_6G, negedge q_Done ) //changing positionX and positionY
 	begin: VGA_DISPLAY
 		if (C&&(I==4)) //fifth letter entered
 		begin 
