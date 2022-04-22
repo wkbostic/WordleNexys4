@@ -191,12 +191,12 @@ module wordle_top (
 		end
 	end
 	
-	assign Green = (CounterY>positionY&&CounterY<(positionY+stepY)) &&
-		       (   (CounterX>positionX&&CounterX<(positionX+sizeX)&&Green1) 
-			|| (CounterX>(positionX+sizeX+stepX)&&CounterX<(positionX+sizeX*2+stepX)&&Green2) 
-			|| (CounterX>(positionX+sizeX*2+stepX*2)&&CounterX<(positionX+sizeX*3+stepX*2)&&Green2) 
-			|| (CounterX>(positionX+sizeX*3+stepX*3)&&CounterX<(positionX+sizeX*4+stepX*3)&&Green2) 
-			|| (CounterX>(positionX+sizeX*4+stepX*4)&&CounterX<(positionX+sizeX*5+stepX*4)&&Green2)    ); 
+	assign Green = (CounterY>positionY_g&&CounterY_g<(positionY_g+stepY_g)) &&
+		       (   (CounterX>positionX_g&&CounterX_g<(positionX_g+sizeX_g)&&Green1) 
+			|| (CounterX>(positionX_g+sizeX_g+stepX_g)&&CounterX<(positionX_g+sizeX_g*2+stepX_g)&&Green2) 
+			|| (CounterX>(positionX_g+sizeX_g*2+stepX_g*2)&&CounterX<(positionX_g+sizeX_g*3+stepX_g*2)&&Green3) 
+			|| (CounterX>(positionX_g+sizeX_g*3+stepX_g*3)&&CounterX<(positionX_g+sizeX_g*4+stepX_g*3)&&Green4) 
+			|| (CounterX>(positionX_g+sizeX_g*4+stepX_g*4)&&CounterX<(positionX_g+sizeX_g*5+stepX_g*4)&&Green5)    ); 
 	assign Red = 0; 
 	assign Blue = 0; 
 		
