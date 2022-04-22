@@ -106,7 +106,7 @@ module wordle_top (
 	
 	ee201_debouncer #(.N_dc(25)) ee201_debouncer_1 (.CLK(sys_clk), .RESET(reset), .PB(BtnC), .DPB( ), .SCEN(Start_Ack_SCEN), .MCEN( ), .CCEN( ));	
 	
-	hvsync_generator syncgen(.clk(clk), .reset(reset),.vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync), .inDisplayArea(inDisplayArea), .CounterX(CounterX), .CounterY(CounterY));
+	hvsync_generator syncgen(.clk(clk), .reset(reset),.vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync), .inDisplayArea(inDisplayArea), .counterX(CounterX), .counterY(CounterY));
 
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done )
 	begin : OUTPUT_STATE_AS_STRING
@@ -141,13 +141,19 @@ module wordle_top (
 	begin: VGA_DISPLAY
 		if (C&&(I==4)) //fifth letter entered
 		begin 
-					
+			if ({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord) 
+			begin 
+				{Green1, Green2, Green3, Green4, Green5} = 5'b11111;
+			end
 		end
 	end
 	
-	assign Green = ({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord) && 
-		       (CounterY>positionY&&CounterY<(positionY+stepY))&&((CounterX>31&&CounterX<95) || (CounterX>159&&CounterX<223) 
-			|| (CounterX>287&&CounterX<351) || (CounterX>415&&CounterX<479) || (CounterX>543&&CounterX<607)); 
+	assign Green = (CounterY>positionY&&CounterY<(positionY+stepY)) &&
+		       (   (CounterX>positionX&&CounterX<(positionX+stepX)&&Green1) 
+			|| (CounterX>(positionX+stepX*2)&&CounterX<(positionX+stepX*3)&&Green2) 
+			|| (CounterX>(positionX+stepX*4)&&CounterX<(positionX+stepX*5)&&Green3) 
+			|| (CounterX>(positionX+stepX*6)&&CounterX<(positionX+stepX*7)&&Green4) 
+			|| (CounterX>(positionX+stepX*8)&&CounterX<(positionX+stepX*9)&&Green5)   ); 
 	assign Red = 0; 
 	assign Blue = 0; 
 		
