@@ -42,6 +42,7 @@ module wordle_top (
 	reg [39:0] 		randomWord;
 	reg [39:0] 		history[0:4];
 	wire [7:0] 		first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
+	wire [7:0]		first_letter_r, second_letter_r, third_letter_r, fourth_letter_r, fifth_letter_r; //TODO
 	reg [3:0] 		I;
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
@@ -50,13 +51,11 @@ module wordle_top (
 	wire[9:0] 		CounterY; 
 	wire			inDisplayArea; 
 	reg			vga_r, vga_g, vga_b; 
-	wire 			Red; 
-	wire			Green;
-	wire			Blue;
 	wire [2:0] 		row; 
 	wire [2:0]		column; 
 	reg [2:0]		color_array[0:5][0:4]; //an array with 6 rows and 5 columns, each of size 3-bit in the order: Red, Green, Blue
-	
+// Assigning each wire with a letter from randomWord 
+	assign {first_letter_r, second_letter_r, third_letter_r, fourth_letter_r, fifth_letter_r} = randomWord; 
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
@@ -76,8 +75,6 @@ module wordle_top (
 // it is necessary to provide global routing to this signal. 
 // The BUFGPs buffer these input ports and connect them to the global 
 // routing resources in the FPGA.
-
-	
 	assign reset = Sw0;
 	
 //------------
@@ -96,7 +93,6 @@ module wordle_top (
 	// your decision should not be "too fast" or you will not see you state machine working
 	assign	sys_clk = DIV_CLK[25]; // DIV_CLK[25] (~1.5Hz) = (100MHz / 2**26)
 	
-
 //------------
 // INPUT: SWITCHES & BUTTONS
 	assign {U, D, L, R, C} = {BtnU, BtnD, BtnL, BtnR, BtnC};
@@ -132,7 +128,6 @@ module wordle_top (
 	
 	//This always block stores the previous 5-letter guesses in an array called "history" 
 	//The block updates with every exit of a state 
-	//TODO: figure out whether you need blocking or nonblocking 
 	always @ ( negedge q_1G or negedge q_2G or negedge q_3G or negedge q_4G or negedge q_5G or negedge q_6G or negedge q_Done )
 	begin : UPDATE_HISTORY
 		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
@@ -149,16 +144,16 @@ module wordle_top (
 				reg [5:0] k; //local variable to look at different letters within "history" and "randomWord" 
 				k = 39; 
 				for (i=0; i<5; i=i+1) begin
-					if (history[0][k:k-7] == {}) begin //if the letter matches any of the letters in randomWord 
+					if (history[0][k:k-7] == {first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r}) begin //if the letter matches any of the letters in randomWord 
 						if (history[0][k:k-7] == randomWord[k:k-7]) begin //if the position of the letter in the word is correct, green block 
-							color_array[0][i] = 3'b010; 
+							color_array[0][i] <= 3'b010; 
 						end
 						else begin //yellow block 
-							color_array[0][i] = 3'b110; 
+							color_array[0][i] <= 3'b110; 
 						end
 					end
 					else begin //if the letter is not a match, the color block is white 
-						color_array[0][i] = 3'b111; 
+						color_array[0][i] <= 3'b111; 
 					end
 				k = k - 8; 
 				end 
