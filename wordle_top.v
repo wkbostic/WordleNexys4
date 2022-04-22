@@ -55,14 +55,7 @@ module wordle_top (
 	wire			Blue;
 	wire [2:0] 		row; 
 	wire [2:0]		column; 
-	reg			color_green[0:5][0:4]; //color is an array with 6 rows and 5 columns, each of size 1-bit
-	
-	localparam
-		first_letter_r = randomWord[39:32], 
-		second_letter_r = randomWord[31:24], 
-		third_letter_r = randomWord[23:16], 
-		fourth_letter_r = randomWord[15:8], 
-		fifth_letter_r = randomWord[7:0]; 
+	reg [2:0]		color_array[0:5][0:4]; //an array with 6 rows and 5 columns, each of size 3-bit
 	
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
@@ -139,6 +132,7 @@ module wordle_top (
 	
 	//This always block stores the previous 5-letter guesses in an array called "history" 
 	//The block updates with every exit of a state 
+	//TODO: figure out whether you need blocking or nonblocking 
 	always @ ( negedge q_1G or negedge q_2G or negedge q_3G or negedge q_4G or negedge q_5G or negedge q_6G or negedge q_Done )
 	begin : UPDATE_HISTORY
 		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
@@ -151,44 +145,22 @@ module wordle_top (
 				history[4] <= "     ";
 			end
 			7'b0100000: begin //first guess 
-				history[0] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
-				
-				if (first_letter == (first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r)) begin
-					if (first_letter == first_letter_r) begin //green block 
-						color_red[0][0] = 0; 
-						color_green[0][0] = 1; 
-						color_blue[0][0] = 0; 
-					end
-					else begin //yellow block 
-						color_red[0][0] = 1 
-						color_green[0][0] = 1; 
-						color_blue[0][0] = 0;
-					end
-				end
-				else begin //if the letter is not a match, the color block is white 
-					color_red[0][0] = 1; 
-					color_green[0][0] = 1; 
-					color_blue[0][0] = 1; 
-				end
-				
-				for (k=0; k<5; k=k+1) begin
-					if (guessArray[k] == (first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r)) begin
-						if (guessArray[k] == answerArray[k]) begin //green block 
-							color_red[0][k] = 0; 
-							color_green[0][k] = 1; 
-							color_blue[0][k] = 0; 
+				history[0] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				reg [5:0] k; //local variable to look at different letters within "history" and "randomWord" 
+				k = 39; 
+				for (i=0; i<5; i=i+1) begin
+					if (history[0][k:k-7] == {}) begin //if the letter matches any of the letters in randomWord 
+						if (history[0][k:k-7] == randomWord[k:k-7]) begin //if the position of the letter in the word is correct, green block 
+							color_array[0][i] = 3'b010; 
 						end
 						else begin //yellow block 
-							color_red[0][k] = 1 
-							color_green[0][k] = 1; 
-							color_blue[0][k] = 0;
+							color_array[0][i] = 3'b110; 
 						end
 					end
 					else begin //if the letter is not a match, the color block is white 
-						color_red[0][k] = 1; 
-						color_green[0][k] = 1; 
-						color_blue[0][k] = 1; 
+						color_array[0][i] = 3'b111; 
 					end
+				k = k - 8; 
 				end 
 			end
 			7'b0010000: begin //second guess
