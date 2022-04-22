@@ -40,6 +40,8 @@ module wordle_top (
 	wire 			q_IKB, q_Run, q_DoneKB;
 	wire 			win, lose; 
 	reg [39:0] 		randomWord;
+	reg [39:0] 		history[0:4];
+	wire [7:0] 		first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
 	reg [3:0] 		I;
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
@@ -120,6 +122,38 @@ module wordle_top (
 			8'b00000100: state = "Q5";
 			8'b00000010: state = "Q6";
 			8'b00000001: state = "QD";
+		endcase
+	end
+	
+	always @ ( negedge q_1G or negedge q_2G or negedge q_3G or negedge q_4G or negedge q_5G or negedge q_6G or negedge q_Done )
+	begin : UPDATE_HISTORY
+		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
+		case ( {q_I, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done} )
+			7'b1000000: begin
+				history[0] <= "     ";
+				history[1] <= "     ";
+				history[2] <= "     ";
+				history[3] <= "     ";
+				history[4] <= "     ";
+			end
+			7'b0100000: begin
+				history[0] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+			end
+			7'b0010000: begin
+				history[1] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+			end
+			7'b0001000: begin
+				history[2] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+			end
+			7'b0000100: begin
+				history[3] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+			end
+			7'b0000010: begin
+				history[4] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+			end
+			7'b0000001: begin
+				history[5] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+			end
 		endcase
 	end
 	
