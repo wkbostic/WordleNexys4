@@ -145,8 +145,8 @@ module wordle_top (
 				history[0] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
 				k = 39; 
 				for (i=0; i<5; i=i+1) begin
-					if (history[0][k:k-7] == {first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r}) begin //if the letter matches any of the letters in randomWord 
-						if (history[0][k:k-7] == randomWord[k:k-7]) begin //if the position of the letter in the word is correct, green block 
+					if (history[0][k-:8] == {first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r}) begin //if the letter matches any of the letters in randomWord 
+						if (history[0][k-:8] == randomWord[k-:8]) begin //if the position of the letter in the word is correct, green block 
 							color_array[0][i] <= 3'b010; 
 						end
 						else begin //yellow block 
