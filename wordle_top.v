@@ -166,8 +166,8 @@ module wordle_top (
 //------------
 // OUTPUT: VGA Display	
 	localparam
-		positionX_g = , 
-		positionY_g = , 
+		positionX_g = 224, 
+		positionY_g = 8, 
 		stepX_g = 8, 
 		stepY_g = 8, 
 		sizeX_g = 40,
