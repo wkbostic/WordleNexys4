@@ -39,7 +39,6 @@ module wordle_top (
 	wire 			q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done;
 	wire 			q_IKB, q_Run, q_DoneKB;
 	wire 			win, lose; 
-	reg [39:0] 		guessWord;	
 	reg [39:0] 		randomWord;
 	reg [3:0] 		I;
 	reg [2*8-1:0] 		state;
@@ -52,7 +51,6 @@ module wordle_top (
 	wire 			R; 
 	wire			G;
 	wire			B;
-	
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
@@ -100,7 +98,8 @@ module wordle_top (
 //------------
 // DESIGN
 	wordle_sm SM1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .C(C), .curr_letter(curr_letter), .q_I(q_I), 
-		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(lose), .randomWord(randomWord), .guessWord(guessWord), .I(I));	
+		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(lose), .randomWord(randomWord), .I(I), 
+		      .first_letter(first_letter), .second_letter(second_letter), .third_letter(third_letter), .fourth_letter(fourth_letter), .fifth_letter(fifth_letter));	
 	
 	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), 
 			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(q_DoneKB), .curr_letter(curr_letter));
@@ -131,14 +130,21 @@ module wordle_top (
 	//assign {Ld3, Ld2, Ld1, Ld0} = {BtnL, BtnU, BtnR, BtnD}; // Reset is driven by BtnC
 	
 //------------
-// OUTPUT: VGA Display
+// OUTPUT: VGA Display	
+	localparam
+		positionX = 31, 
+		positionY = 19, 
+		stepX = 64, 
+		stepY = 40; 
+	
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done ) 
 	begin: VGA_DISPLAY
 		if (C&&(I==4)) //fifth letter entered
 		begin 
-			if (guessWord == randomWord) 
+			if ({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord) //if correct guess 
 			begin
-				G = CounterX>100 && CounterX<200 && CounterY[5:3]==7; //TODO: change to right square dimensions
+				G = (CounterY>positionY&&CounterY<(positionY+stepY))&&((CounterX>31&&CounterX<95) || (CounterX>159&&CounterX<223) 
+					|| (CounterX>287&&CounterX<351) || (CounterX>415&&CounterX<479) || (CounterX>543&&CounterX<607)); 
 				R = 0; 
 				B = 0; 
 			end
