@@ -28,7 +28,6 @@ module wordle_top (
 	output 	MemOE, MemWR, RamCS, QuadSpiFlashCS;
 	// Project Specific Outputs
 	output vga_h_sync, vga_v_sync, vga_r, vga_g, vga_b; 
-	// TODO: ADD VGA STUFF HERE
 	
 	/*  LOCAL SIGNALS */
 	wire			reset, ClkPort;
@@ -42,7 +41,7 @@ module wordle_top (
 	reg [39:0] 		randomWord;
 	reg [39:0] 		history[0:4];
 	wire [7:0] 		first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
-	wire [7:0]		first_letter_r, second_letter_r, third_letter_r, fourth_letter_r, fifth_letter_r; //TODO
+	wire [7:0]		first_letter_r, second_letter_r, third_letter_r, fourth_letter_r, fifth_letter_r; //TODO: better way of accessing? 
 	reg [3:0] 		I;
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
@@ -187,7 +186,8 @@ module wordle_top (
 // OUTPUT: VGA Display	
 	
 	///Assignment of row and column for letter blocks 
-	// assigning rows 1-6  
+	// assigning rows 1-6 
+	//TODO: what to assign if it doesn't fall in the letter blocks (like do you want rows/column assignments for the keyboard?) 
 	assign row = (CounterY>8&&CounterY<48) ? 1:
 		     ((CounterX>56&&CounterX<96) ? 2: 
 		      ((CounterX>104&&CounterX<144) ? 3: 
