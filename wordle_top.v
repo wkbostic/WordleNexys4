@@ -191,7 +191,7 @@ module wordle_top (
 		end
 	end
 	
-	assign Green = (CounterY>positionY_g&&CounterY_g<(positionY_g+stepY_g)) &&
+	assign Green = (CounterY>positionY_g&&CounterY_g<(positionY_g+sizeY_g)) &&
 		       (   (CounterX>positionX_g&&CounterX_g<(positionX_g+sizeX_g)&&Green1) 
 			|| (CounterX>(positionX_g+sizeX_g+stepX_g)&&CounterX<(positionX_g+sizeX_g*2+stepX_g)&&Green2) 
 			|| (CounterX>(positionX_g+sizeX_g*2+stepX_g*2)&&CounterX<(positionX_g+sizeX_g*3+stepX_g*2)&&Green3) 
