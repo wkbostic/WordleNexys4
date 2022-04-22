@@ -168,8 +168,10 @@ module wordle_top (
 	localparam
 		positionX = 31, 
 		positionY = 19, 
-		stepX = 64, 
-		stepY = 40; 
+		stepX = 8, 
+		stepY = 8, 
+		sizeX = 40,
+		sizeY = 40; 
 	
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done ) //changing positionX and positionY
 	begin: VGA_DISPLAY
@@ -183,11 +185,11 @@ module wordle_top (
 	end
 	
 	assign Green = (CounterY>positionY&&CounterY<(positionY+stepY)) &&
-		       (   (CounterX>positionX&&CounterX<(positionX+stepX)&&Green1) 
-			|| (CounterX>(positionX+stepX*2)&&CounterX<(positionX+stepX*3)&&Green2) 
-			|| (CounterX>(positionX+stepX*4)&&CounterX<(positionX+stepX*5)&&Green3) 
-			|| (CounterX>(positionX+stepX*6)&&CounterX<(positionX+stepX*7)&&Green4) 
-			|| (CounterX>(positionX+stepX*8)&&CounterX<(positionX+stepX*9)&&Green5)   ); 
+		       (   (CounterX>positionX&&CounterX<(positionX+sizeX)&&Green1) 
+			|| (CounterX>(positionX+sizeX+stepX)&&CounterX<(positionX+sizeX*2+stepX)&&Green2) 
+			|| (CounterX>(positionX+sizeX*2+stepX*2)&&CounterX<(positionX+sizeX*3+stepX*2)&&Green2) 
+			|| (CounterX>(positionX+sizeX*3+stepX*3)&&CounterX<(positionX+sizeX*4+stepX*3)&&Green2) 
+			|| (CounterX>(positionX+sizeX*4+stepX*4)&&CounterX<(positionX+sizeX*5+stepX*4)&&Green2)    ); 
 	assign Red = 0; 
 	assign Blue = 0; 
 		
