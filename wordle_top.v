@@ -53,6 +53,17 @@ module wordle_top (
 	wire 			Red; 
 	wire			Green;
 	wire			Blue;
+	wire [2:0] 		row; 
+	wire [2:0]		column; 
+	reg			color_green[0:5][0:4]; //color is an array with 6 rows and 5 columns, each of size 1-bit
+	
+	localparam
+		first_letter_r = randomWord[39:32], 
+		second_letter_r = randomWord[31:24], 
+		third_letter_r = randomWord[23:16], 
+		fourth_letter_r = randomWord[15:8], 
+		fifth_letter_r = randomWord[7:0]; 
+	
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
@@ -109,7 +120,8 @@ module wordle_top (
 	ee201_debouncer #(.N_dc(25)) ee201_debouncer_1 (.CLK(sys_clk), .RESET(reset), .PB(BtnC), .DPB( ), .SCEN(Start_Ack_SCEN), .MCEN( ), .CCEN( ));	
 	
 	hvsync_generator syncgen(.clk(clk), .reset(reset),.vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync), .inDisplayArea(inDisplayArea), .counterX(CounterX), .counterY(CounterY));
-
+	
+	//This always block outputs the state as strings for readability 
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done )
 	begin : OUTPUT_STATE_AS_STRING
 		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
@@ -125,33 +137,73 @@ module wordle_top (
 		endcase
 	end
 	
+	//This always block stores the previous 5-letter guesses in an array called "history" 
+	//The block updates with every exit of a state 
 	always @ ( negedge q_1G or negedge q_2G or negedge q_3G or negedge q_4G or negedge q_5G or negedge q_6G or negedge q_Done )
 	begin : UPDATE_HISTORY
 		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
 		case ( {q_I, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done} )
-			7'b1000000: begin
+			7'b1000000: begin //initial state
 				history[0] <= "     ";
 				history[1] <= "     ";
 				history[2] <= "     ";
 				history[3] <= "     ";
 				history[4] <= "     ";
 			end
-			7'b0100000: begin
+			7'b0100000: begin //first guess 
 				history[0] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				
+				if (first_letter == (first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r)) begin
+					if (first_letter == first_letter_r) begin //green block 
+						color_red[0][0] = 0; 
+						color_green[0][0] = 1; 
+						color_blue[0][0] = 0; 
+					end
+					else begin //yellow block 
+						color_red[0][0] = 1 
+						color_green[0][0] = 1; 
+						color_blue[0][0] = 0;
+					end
+				end
+				else begin //if the letter is not a match, the color block is white 
+					color_red[0][0] = 1; 
+					color_green[0][0] = 1; 
+					color_blue[0][0] = 1; 
+				end
+				
+				for (k=0; k<5; k=k+1) begin
+					if (guessArray[k] == (first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r)) begin
+						if (guessArray[k] == answerArray[k]) begin //green block 
+							color_red[0][k] = 0; 
+							color_green[0][k] = 1; 
+							color_blue[0][k] = 0; 
+						end
+						else begin //yellow block 
+							color_red[0][k] = 1 
+							color_green[0][k] = 1; 
+							color_blue[0][k] = 0;
+						end
+					end
+					else begin //if the letter is not a match, the color block is white 
+						color_red[0][k] = 1; 
+						color_green[0][k] = 1; 
+						color_blue[0][k] = 1; 
+					end
+				end 
 			end
-			7'b0010000: begin
+			7'b0010000: begin //second guess
 				history[1] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
 			end
-			7'b0001000: begin
+			7'b0001000: begin //third guess 
 				history[2] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
 			end
-			7'b0000100: begin
+			7'b0000100: begin //fourth guess 
 				history[3] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
 			end
-			7'b0000010: begin
+			7'b0000010: begin //fifth guess 
 				history[4] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
 			end
-			7'b0000001: begin
+			7'b0000001: begin //sixth guess 
 				history[5] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
 			end
 		endcase
@@ -165,40 +217,24 @@ module wordle_top (
 	
 //------------
 // OUTPUT: VGA Display	
-	localparam
-		positionX_g = 224, 
-		positionY_g = 8, 
-		stepX_g = 8, 
-		stepY_g = 8, 
-		sizeX_g = 40,
-		sizeY_g = 40,
 	
-		positionX_kb = 112, 
-		positionY_kb = 322, 
-		stepX_kb = 40, 
-		stepY_kb = , 
-		sizeX_kb = , 
-		sizeY_kb = ; 
+	///Assignment of row and column for letter blocks 
+	// assigning rows 1-6  
+	assign row = (CounterY>8&&CounterY<48) ? 1:
+		     ((CounterX>56&&CounterX<96) ? 2: 
+		      ((CounterX>104&&CounterX<144) ? 3: 
+		       ((CounterX>152&&CounterX<192) ? 4: 
+			((CounterX>200&&CounterX<240) ? 5: 
+			 ((CounterX>248&&CounterX<288) ? 6: ; ))))) 
 	
-	always @ ( negedge q_I, negedge q_1G, negedge q_2G, negedge q_3G, negedge q_4G, negedge q_5G, negedge q_6G, negedge q_Done ) //changing positionX and positionY
-	begin: VGA_DISPLAY
-		if (C&&(I==4)) //fifth letter entered
-		begin 
-			if ({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord) 
-			begin 
-				{Green1, Green2, Green3, Green4, Green5} = 5'b11111;
-			end
-		end
-	end
+	// assigning columns 1-5 , 0 if not belonging to a letter block 
+	assign column = (CounterX>224&&CounterX<264) ? 1:
+		     ((CounterX>272&&CounterX<312) ? 2: 
+		      ((CounterX>320&&CounterX<360) ? 3: 
+		       ((CounterX>368&&CounterX<408) ? 4: 
+			((CounterX>416&&CounterX<456) ? 5: ;0)))) 
 	
-	assign Green = (CounterY>positionY_g&&CounterY_g<(positionY_g+sizeY_g)) &&
-		       (   (CounterX>positionX_g&&CounterX_g<(positionX_g+sizeX_g)&&Green1) 
-			|| (CounterX>(positionX_g+sizeX_g+stepX_g)&&CounterX<(positionX_g+sizeX_g*2+stepX_g)&&Green2) 
-			|| (CounterX>(positionX_g+sizeX_g*2+stepX_g*2)&&CounterX<(positionX_g+sizeX_g*3+stepX_g*2)&&Green3) 
-			|| (CounterX>(positionX_g+sizeX_g*3+stepX_g*3)&&CounterX<(positionX_g+sizeX_g*4+stepX_g*3)&&Green4) 
-			|| (CounterX>(positionX_g+sizeX_g*4+stepX_g*4)&&CounterX<(positionX_g+sizeX_g*5+stepX_g*4)&&Green5)    ); 
-	assign Red = 0; 
-	assign Blue = 0; 
+	
 		
 	always @(posedge clk) begin
 		vga_r <= Red & inDisplayArea;
