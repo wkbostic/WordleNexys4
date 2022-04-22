@@ -48,9 +48,9 @@ module wordle_top (
 	wire[9:0] 		CounterY; 
 	wire			inDisplayArea; 
 	reg			vga_r, vga_g, vga_b; 
-	wire 			R; 
-	wire			G;
-	wire			B;
+	wire 			Red; 
+	wire			Green;
+	wire			Blue;
 //------------	
 // Disable the three memories so that they do not interfere with the rest of the design.
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
@@ -143,10 +143,10 @@ module wordle_top (
 		begin 
 			if ({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord) //if correct guess 
 			begin
-				G = (CounterY>positionY&&CounterY<(positionY+stepY))&&((CounterX>31&&CounterX<95) || (CounterX>159&&CounterX<223) 
+				Green = (CounterY>positionY&&CounterY<(positionY+stepY))&&((CounterX>31&&CounterX<95) || (CounterX>159&&CounterX<223) 
 					|| (CounterX>287&&CounterX<351) || (CounterX>415&&CounterX<479) || (CounterX>543&&CounterX<607)); 
-				R = 0; 
-				B = 0; 
+				Red = 0; 
+				Blue = 0; 
 			end
 			//else if any of the letters match any of the letters in randomWord
 			
@@ -157,9 +157,9 @@ module wordle_top (
 
 		
 	always @(posedge clk) begin
-		vga_r <= R & inDisplayArea;
-		vga_g <= G & inDisplayArea;
-		vga_b <= B & inDisplayArea;
+		vga_r <= Red & inDisplayArea;
+		vga_g <= Green & inDisplayArea;
+		vga_b <= Blue & inDisplayArea;
 	end
 		
 	
