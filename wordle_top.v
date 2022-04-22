@@ -137,24 +137,19 @@ module wordle_top (
 		stepX = 64, 
 		stepY = 40; 
 	
-	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done ) 
+	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done ) //changing positionX and positionY
 	begin: VGA_DISPLAY
 		if (C&&(I==4)) //fifth letter entered
 		begin 
-			if ({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord) //if correct guess 
-			begin
-				Green = (CounterY>positionY&&CounterY<(positionY+stepY))&&((CounterX>31&&CounterX<95) || (CounterX>159&&CounterX<223) 
-					|| (CounterX>287&&CounterX<351) || (CounterX>415&&CounterX<479) || (CounterX>543&&CounterX<607)); 
-				Red = 0; 
-				Blue = 0; 
-			end
-			//else if any of the letters match any of the letters in randomWord
-			
+					
 		end
 	end
-
-
-
+	
+	assign Green = ({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord) && 
+		       (CounterY>positionY&&CounterY<(positionY+stepY))&&((CounterX>31&&CounterX<95) || (CounterX>159&&CounterX<223) 
+			|| (CounterX>287&&CounterX<351) || (CounterX>415&&CounterX<479) || (CounterX>543&&CounterX<607)); 
+	assign Red = 0; 
+	assign Blue = 0; 
 		
 	always @(posedge clk) begin
 		vga_r <= Red & inDisplayArea;
