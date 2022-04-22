@@ -131,6 +131,8 @@ module wordle_top (
 	always @ ( negedge q_1G or negedge q_2G or negedge q_3G or negedge q_4G or negedge q_5G or negedge q_6G or negedge q_Done )
 	begin : UPDATE_HISTORY
 		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
+		reg [5:0] k; //local variable to look at different letters within "history" and "randomWord" 
+		integer i; 
 		case ( {q_I, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done} )
 			7'b1000000: begin //initial state
 				history[0] <= "     ";
@@ -141,7 +143,6 @@ module wordle_top (
 			end
 			7'b0100000: begin //first guess 
 				history[0] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
-				reg [5:0] k; //local variable to look at different letters within "history" and "randomWord" 
 				k = 39; 
 				for (i=0; i<5; i=i+1) begin
 					if (history[0][k:k-7] == {first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r}) begin //if the letter matches any of the letters in randomWord 
@@ -192,14 +193,14 @@ module wordle_top (
 		      ((CounterX>104&&CounterX<144) ? 3: 
 		       ((CounterX>152&&CounterX<192) ? 4: 
 			((CounterX>200&&CounterX<240) ? 5: 
-			 ((CounterX>248&&CounterX<288) ? 6: ; ))))) 
+			 ((CounterX>248&&CounterX<288) ? 6: 0 ))))); 
 	
 	// assigning columns 1-5 , 0 if not belonging to a letter block 
 	assign column = (CounterX>224&&CounterX<264) ? 1:
 		     ((CounterX>272&&CounterX<312) ? 2: 
 		      ((CounterX>320&&CounterX<360) ? 3: 
 		       ((CounterX>368&&CounterX<408) ? 4: 
-			((CounterX>416&&CounterX<456) ? 5: ;0)))) 
+			((CounterX>416&&CounterX<456) ? 5: 0)))); 
 	
 	
 		
