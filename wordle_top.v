@@ -265,7 +265,6 @@ module wordle_top (
 	
 	///Assignment of row and column for letter blocks 
 	// assigning rows 1-6 
-	//TODO: what to assign if it doesn't fall in the letter blocks (like do you want rows/column assignments for the keyboard?) 
 	assign row = (CounterY>8&&CounterY<48) ? 1:
 		     ((CounterY>56&&CounterY<96) ? 2: 
 		      ((CounterY>104&&CounterY<144) ? 3: 
