@@ -51,7 +51,11 @@ module wordle_top (
 	reg			vga_r, vga_g, vga_b; //TODO: new array for VGA letter masking
 	wire [2:0] 		row; 
 	wire [2:0]		column; 
+	wire [2:0] 		row_kb; 
+	wire [2:0] 		column_kb; 
 	reg [2:0]		color_array[0:5][0:4]; //an array with 6 rows and 5 columns, each of size 3-bit in the order: Red, Green, Blue
+	reg [2:0] 		color_array_kb[0:5][0:4]; 
+	
 // Assigning each wire with a letter from randomWord 
 	assign {first_letter_r, second_letter_r, third_letter_r, fourth_letter_r, fifth_letter_r} = randomWord; 
 //------------	
@@ -263,11 +267,11 @@ module wordle_top (
 	// assigning rows 1-6 
 	//TODO: what to assign if it doesn't fall in the letter blocks (like do you want rows/column assignments for the keyboard?) 
 	assign row = (CounterY>8&&CounterY<48) ? 1:
-		     ((CounterX>56&&CounterX<96) ? 2: 
-		      ((CounterX>104&&CounterX<144) ? 3: 
-		       ((CounterX>152&&CounterX<192) ? 4: 
-			((CounterX>200&&CounterX<240) ? 5: 
-			 ((CounterX>248&&CounterX<288) ? 6: 0 ))))); 
+		     ((CounterY>56&&CounterY<96) ? 2: 
+		      ((CounterY>104&&CounterY<144) ? 3: 
+		       ((CounterY>152&&CounterY<192) ? 4: 
+			((CounterY>200&&CounterY<240) ? 5: 
+			 ((CounterY>248&&CounterY<288) ? 6: 0 ))))); 
 	
 	// assigning columns 1-5 , 0 if not belonging to a letter block 
 	assign column = (CounterX>224&&CounterX<264) ? 1:
@@ -276,12 +280,25 @@ module wordle_top (
 		       ((CounterX>368&&CounterX<408) ? 4: 
 			((CounterX>416&&CounterX<456) ? 5: 0)))); 
 	
-	//TODO: add row and column for keyboard
+	assign row_kb = (CounterY>322&&CounterY<362) ? 1:
+			((CounterY>370&&CounterY<410) ? 2: 
+			 ((CounterY>416&&CounterY<456) ? 3: 0 )); 
+	
+	assign column_kb = (CounterX>112&&CounterX<152) ? 1:
+			((CounterX>160&&CounterX<200) ? 2: 
+		      	((CounterX>208&&CounterX<248) ? 3: 
+			 ((CounterX>256&&CounterX<296) ? 4: 
+			  ((CounterX>304&&CounterX<344) ? 5: 
+			   ((CounterX>352&&CounterX<392) ? 6:
+			    ((CounterX>400&&CounterX<440) ? 7: 
+			     ((CounterX>448&&CounterX<488) ? 8: 
+			      ((CounterX>496&&CounterX<536) ? 9: 
+			       ((CounterX>544&&CounterX<588) ? 10: 0))))))))); 
 		
 	always @(posedge clk) begin
-		vga_r <= color_array[row][column][2] & inDisplayArea;
-		vga_g <= color_array[row][column][1] & inDisplayArea;
-		vga_b <= color_array[row][column][0] & inDisplayArea;
+		vga_r <= (color_array[row][column][2] & inDisplayArea) || (color_array_kb[row_kb][column_kb][2] & inDisplayArea);
+		vga_g <= (color_array[row][column][1] & inDisplayArea) || (color_array_kb[row_kb][column_kb][1] & inDisplayArea);
+		vga_b <= (color_array[row][column][0] & inDisplayArea) || (color_array_kb[row_kb][column_kb][0] & inDisplayArea);
 	end
 	
 	//TODO: change tile color for selected letter
