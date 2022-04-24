@@ -146,15 +146,15 @@ module wordle_sm(Clk, reset, Start, Ack, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q
 		       Q1G:
 			 begin
 			   I <= I + 1; 
-			   if (I==3'b000) //if I = 0
+				 if (C && I==3'b000) //if I = 0
 				first_letter <= curr_letter;
-			   else if (I==3'b001) //if I = 1
+			   else if (C && I==3'b001) //if I = 1
 				second_letter <= curr_letter;
-			   else if (I==3'b010) //if I = 2 
+			   else if (C && I==3'b010) //if I = 2 
 				third_letter <= curr_letter; 
-			   else if (I==3'b011) //if I = 3
+			   else if (C && I==3'b011) //if I = 3
 				fourth_letter <= curr_letter; 
-			   else begin //if I = 4 
+			   else if (C) begin //if I = 4 
 				fifth_letter = curr_letter; 
 				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
 				  	state <= QDONE; 
@@ -172,32 +172,35 @@ module wordle_sm(Clk, reset, Start, Ack, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q
 		       Q2G: 
  			 begin
 			   I <= I + 1; 
-			   if (I==3'b000) //if I = 0
-				first_letter <= curr_letter;
-			   else if (I==3'b001) //if I = 1
-				second_letter <= curr_letter;
-			   else if (I==3'b010) //if I = 2 
-				third_letter <= curr_letter; 
-			   else if (I==3'b011) //if I = 3
-				fourth_letter <= curr_letter; 
-			   else begin //if I = 4 
-				fifth_letter = curr_letter; 
-				   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
-				  	state <= QDONE; 
-				else begin
-					state <= Q3G; 
-					first_letter <= 0; 
-					second_letter <= 0; 
-					third_letter <= 0; 
-					fourth_letter <= 0; 
-					fifth_letter <= 0; 
-					I <= 0; 
-				end
-			   end 
+				 if (C) begin
+				   if (I==3'b000) //if I = 0
+					first_letter <= curr_letter;
+				   else if (I==3'b001) //if I = 1
+					second_letter <= curr_letter;
+				   else if (I==3'b010) //if I = 2 
+					third_letter <= curr_letter; 
+				   else if (I==3'b011) //if I = 3
+					fourth_letter <= curr_letter; 
+				   else begin //if I = 4 
+					fifth_letter = curr_letter; 
+					   if({first_letter, second_letter, third_letter, fourth_letter, fifth_letter} == randomWord)
+						state <= QDONE; 
+					else begin
+						state <= Q3G; 
+						first_letter <= 0; 
+						second_letter <= 0; 
+						third_letter <= 0; 
+						fourth_letter <= 0; 
+						fifth_letter <= 0; 
+						I <= 0; 
+					end
+				   end 
+				 end
 			 end
 		       Q3G: 
  			  begin
-			   I <= I + 1; 
+			   I <= I + 1;
+				  if(C) begin
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -220,10 +223,12 @@ module wordle_sm(Clk, reset, Start, Ack, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q
 					I <= 0; 
 				end
 			   end
+				  end
 			  end
 		       Q4G: 
  			  begin
 			   I <= I + 1; 
+				  if (C) begin
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -247,9 +252,11 @@ module wordle_sm(Clk, reset, Start, Ack, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q
 				end
 			   end
 			  end
+			  end
 		       Q5G:
  			   begin
 			   I <= I + 1; 
+				   if (C) begin
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -273,9 +280,11 @@ module wordle_sm(Clk, reset, Start, Ack, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q
 				end
 			   end
 			  end
+			   end
 		       Q6G:
 			 begin
 			   I <= I + 1; 
+				 if (C) begin
 			   if (I==3'b000) //if I = 0
 				first_letter <= curr_letter;
 			   else if (I==3'b001) //if I = 1
@@ -288,6 +297,7 @@ module wordle_sm(Clk, reset, Start, Ack, C, q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q
 				fifth_letter <= curr_letter;
 				state <= QDONE; 
 			   end
+			 end
 			 end
 		       QDONE: 
 			   if(C)
