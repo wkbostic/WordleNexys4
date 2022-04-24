@@ -39,9 +39,8 @@ module wordle_top (
 	wire 			q_IKB, q_Run, q_DoneKB;
 	wire 			win, lose; 
 	reg [39:0] 		randomWord;
-	reg [39:0] 		history[0:4];
+	reg [39:0] 		history[0:4]; 
 	wire [7:0] 		first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
-	wire [7:0]		first_letter_r, second_letter_r, third_letter_r, fourth_letter_r, fifth_letter_r; //TODO: better way of accessing? 
 	reg [3:0] 		I;
 	reg [2*8-1:0] 		state;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
@@ -49,7 +48,7 @@ module wordle_top (
 	wire[9:0] 		CounterX; 
 	wire[9:0] 		CounterY; 
 	wire			inDisplayArea; 
-	reg			vga_r, vga_g, vga_b; 
+	reg			vga_r, vga_g, vga_b; //TODO: new array for VGA letter masking
 	wire [2:0] 		row; 
 	wire [2:0]		column; 
 	reg [2:0]		color_array[0:5][0:4]; //an array with 6 rows and 5 columns, each of size 3-bit in the order: Red, Green, Blue
@@ -277,14 +276,15 @@ module wordle_top (
 		       ((CounterX>368&&CounterX<408) ? 4: 
 			((CounterX>416&&CounterX<456) ? 5: 0)))); 
 	
-	
+	//TODO: add row and column for keyboard
 		
 	always @(posedge clk) begin
 		vga_r <= color_array[row][column][2] & inDisplayArea;
 		vga_g <= color_array[row][column][1] & inDisplayArea;
 		vga_b <= color_array[row][column][0] & inDisplayArea;
 	end
-		
+	
+	//TODO: change tile color for selected letter
 	
 endmodule
 
