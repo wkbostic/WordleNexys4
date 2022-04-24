@@ -144,7 +144,7 @@ module wordle_top (
 				history[0] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
 				k = 39; 
 				for (i=0; i<5; i=i+1) begin
-					if (history[0][k-:8] == (first_letter_r || second_letter_r || third_letter_r || fourth_letter_r || fifth_letter_r)) begin //if the letter matches any of the letters in randomWord 
+					if (({history[0][k-:8],history[0][k-:8],history[0][k-:8],history[0][k-:8],history[0][k-:8]} && randomWord) != 0) begin //if the letter matches any of the letters in randomWord 
 						if (history[0][k-:8] == randomWord[k-:8]) begin //if the position of the letter in the word is correct, green block 
 							color_array[0][i] <= 3'b010; 
 						end
@@ -156,22 +156,97 @@ module wordle_top (
 						color_array[0][i] <= 3'b111; 
 					end
 				k = k - 8; 
-				end 
+				end
 			end
 			7'b0010000: begin //second guess
-				history[1] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				history[1] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				k = 39; 
+				for (i=0; i<5; i=i+1) begin
+					if (({history[1][k-:8],history[1][k-:8],history[1][k-:8],history[1][k-:8],history[1][k-:8]} && randomWord) != 0) begin //if the letter matches any of the letters in randomWord 
+						if (history[1][k-:8] == randomWord[k-:8]) begin //if the position of the letter in the word is correct, green block 
+							color_array[1][i] <= 3'b010; 
+						end
+						else begin //yellow block 
+							color_array[1][i] <= 3'b110; 
+						end
+					end
+					else begin //if the letter is not a match, the color block is white 
+						color_array[1][i] <= 3'b111; 
+					end
+				k = k - 8; 
+				end
 			end
 			7'b0001000: begin //third guess 
-				history[2] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				history[2] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				k = 39; 
+				for (i=0; i<5; i=i+1) begin
+					if (({history[2][k-:8],history[2][k-:8],history[2][k-:8],history[2][k-:8],history[2][k-:8]} && randomWord) != 0) begin //if the letter matches any of the letters in randomWord 
+						if (history[2][k-:8] == randomWord[k-:8]) begin //if the position of the letter in the word is correct, green block 
+							color_array[2][i] <= 3'b010; 
+						end
+						else begin //yellow block 
+							color_array[2][i] <= 3'b110; 
+						end
+					end
+					else begin //if the letter is not a match, the color block is white 
+						color_array[2][i] <= 3'b111; 
+					end
+				k = k - 8; 
+				end
 			end
 			7'b0000100: begin //fourth guess 
-				history[3] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				history[3] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				k = 39; 
+				for (i=0; i<5; i=i+1) begin
+					if (({history[3][k-:8],history[3][k-:8],history[3][k-:8],history[3][k-:8],history[3][k-:8]} && randomWord) != 0) begin //if the letter matches any of the letters in randomWord 
+						if (history[3][k-:8] == randomWord[k-:8]) begin //if the position of the letter in the word is correct, green block 
+							color_array[3][i] <= 3'b010; 
+						end
+						else begin //yellow block 
+							color_array[3][i] <= 3'b110; 
+						end
+					end
+					else begin //if the letter is not a match, the color block is white 
+						color_array[3][i] <= 3'b111; 
+					end
+				k = k - 8; 
+				end
 			end
 			7'b0000010: begin //fifth guess 
-				history[4] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				history[4] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				k = 39; 
+				for (i=0; i<5; i=i+1) begin
+					if (({history[4][k-:8],history[4][k-:8],history[4][k-:8],history[4][k-:8],history[4][k-:8]} && randomWord) != 0) begin //if the letter matches any of the letters in randomWord 
+						if (history[4][k-:8] == randomWord[k-:8]) begin //if the position of the letter in the word is correct, green block 
+							color_array[4][i] <= 3'b010; 
+						end
+						else begin //yellow block 
+							color_array[4][i] <= 3'b110; 
+						end
+					end
+					else begin //if the letter is not a match, the color block is white 
+						color_array[4][i] <= 3'b111; 
+					end
+				k = k - 8; 
+				end
 			end
 			7'b0000001: begin //sixth guess 
-				history[5] <= {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				history[5] = {first_letter, second_letter, third_letter, fourth_letter, fifth_letter};
+				k = 39; 
+				for (i=0; i<5; i=i+1) begin
+					if (({history[5][k-:8],history[5][k-:8],history[5][k-:8],history[5][k-:8],history[5][k-:8]} && randomWord) != 0) begin //if the letter matches any of the letters in randomWord 
+						if (history[5][k-:8] == randomWord[k-:8]) begin //if the position of the letter in the word is correct, green block 
+							color_array[5][i] <= 3'b010; 
+						end
+						else begin //yellow block 
+							color_array[5][i] <= 3'b110; 
+						end
+					end
+					else begin //if the letter is not a match, the color block is white 
+						color_array[5][i] <= 3'b111; 
+					end
+				k = k - 8; 
+				end
 			end
 		endcase
 	end
@@ -205,9 +280,9 @@ module wordle_top (
 	
 		
 	always @(posedge clk) begin
-		vga_r <= color_array[row][column][1] & inDisplayArea;
-		vga_g <= color_array[row][column][2] & inDisplayArea;
-		vga_b <= color_array[row][column][3] & inDisplayArea;
+		vga_r <= color_array[row][column][2] & inDisplayArea;
+		vga_g <= color_array[row][column][1] & inDisplayArea;
+		vga_b <= color_array[row][column][0] & inDisplayArea;
 	end
 		
 	
