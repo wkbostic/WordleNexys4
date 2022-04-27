@@ -89,7 +89,7 @@
 
 `timescale 1ns / 100ps
 
-module ee354_debouncer(CLK, RESET, PB, DPB, SCEN, MCEN, CCEN);
+module ee201_debouncer_1(CLK, RESET, PB, DPB, SCEN, MCEN, CCEN);
 
 //inputs
 input	CLK, RESET;
