@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done, curr_letter, done);
+module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done, curr_letter, done, col_curr, row_curr);
     /*  INPUTS */
 	// Clock & Reset
 	input Clk, reset, Start, Ack;
@@ -11,7 +11,7 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done
     output curr_letter;
 	// store current state
 	output q_I, q_Run, q_Done;
-	reg[2:0] = state; 
+	reg[2:0] state; 
 	assign {q_I, q_Run, q_Done} = state;
 	
 	// aliasing states with one-hot state encoding
@@ -20,11 +20,11 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done
 	   QRUN = 3'b010,
 	   QDONE = 3'b001;
     
-	reg [4:0] col;
-    reg [1:0] row;
+	output [4:0] col_curr;
+    output [1:0] row_curr;
     
     // Create keyboard arrangement as a localparam
-    localparam keyboard = "ABCDEFGHIJKLMNOPQRSTUVWXYZ,.";
+    localparam keyboard = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
     // NSL AND SM
     always @ (posedge Clk, posedge reset)
@@ -48,7 +48,7 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done
                        row <= row + 1;
 		    else if(L && col != 0)
                        col <= col -1;
-                    else if(C && (row == 2 && col != 7 || row != 2 && col != 9))
+                    else if(R && (row == 2 && col != 5 || row != 2 && col != 9))
                        col <= col + 1;
 		   end
                QDONE: 

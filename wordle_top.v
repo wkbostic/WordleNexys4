@@ -34,7 +34,9 @@ module wordle_top (
 	wire			board_clk, sys_clk;
 	reg [26:0]	    	DIV_CLK;
 	wire			U, D, L, R, C;
-	wire 			curr_letter;  
+	wire 			curr_letter; 
+	wire [4:0]		col_curr;
+	wire [1:0]		row_curr;
 	wire 			q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done;
 	wire 			q_IKB, q_Run, q_DoneKB;
 	wire 			win, lose; 
@@ -42,7 +44,7 @@ module wordle_top (
 	reg [39:0] 		history[0:4]; 
 	wire [7:0] 		first_letter, second_letter, third_letter, fourth_letter, fifth_letter;
 	reg [3:0] 		I;
-	reg [2*8-1:0] 		state;
+	reg [2*8-1:0] 	state_string;
 	wire  			Start_Ack_SCEN; // debounced Start and Ack signal
 	//VGA Display 
 	wire[9:0] 		CounterX; 
@@ -54,7 +56,8 @@ module wordle_top (
 	wire [2:0] 		row_kb; 
 	wire [2:0] 		column_kb; 
 	reg [2:0]		color_array[0:5][0:4]; //an array with 6 rows and 5 columns, each of size 3-bit in the order: Red, Green, Blue
-	reg [2:0] 		color_array_kb[0:5][0:4]; 
+	reg [2:0] 		color_array_kb[0:2][0:9]; //array with 3 rows, 2 columns, represents keyboard, same bit order as above
+	wire [91:0] 	vga_letters[0:113];
 	
 // Assigning each wire with a letter from randomWord 
 	assign {first_letter_r, second_letter_r, third_letter_r, fourth_letter_r, fifth_letter_r} = randomWord; 
@@ -103,28 +106,29 @@ module wordle_top (
 // DESIGN
 	wordle_sm SM1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .C(C), .curr_letter(curr_letter), .q_I(q_I), 
 		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(lose), .randomWord(randomWord), .I(I), 
-		      .first_letter(first_letter), .second_letter(second_letter), .third_letter(third_letter), .fourth_letter(fourth_letter), .fifth_letter(fifth_letter));	
+		      .first_letter(first_letter), .second_letter(second_letter), .third_letter(third_letter), .fourth_letter(fourth_letter), .fifth_letter(fifth_letter),
+		      .vga_letters);	
 	
 	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), 
-			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(q_DoneKB), .curr_letter(curr_letter));
+			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(q_DoneKB), .curr_letter(curr_letter), .col_curr(col_curr), .row_curr(row_curr));
 	
 	ee201_debouncer #(.N_dc(25)) ee201_debouncer_1 (.CLK(sys_clk), .RESET(reset), .PB(BtnC), .DPB( ), .SCEN(Start_Ack_SCEN), .MCEN( ), .CCEN( ));	
 	
-	hvsync_generator syncgen(.clk(clk), .reset(reset),.vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync), .inDisplayArea(inDisplayArea), .counterX(CounterX), .counterY(CounterY));
+	hvsync_generator syncgen(.clk(sys_clk), .reset(reset),.vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync), .inDisplayArea(inDisplayArea), .counterX(CounterX), .counterY(CounterY));
 	
 	//This always block outputs the state as strings for readability 
 	always @ ( q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done )
 	begin : OUTPUT_STATE_AS_STRING
 		(* full_case, parallel_case *) // to avoid prioritization (Verilog 2001 standard)
 		case ( {q_I, q_1G, q_2G, q_3G, q_4G, q_5G, q_6G, q_Done} )
-			8'b10000000: state = "QI";
-			8'b01000000: state = "Q1";
-			8'b00100000: state = "Q2";
-			8'b00010000: state = "Q3";
-			8'b00001000: state = "Q4";
-			8'b00000100: state = "Q5";
-			8'b00000010: state = "Q6";
-			8'b00000001: state = "QD";
+			8'b10000000: state_string = "QI";
+			8'b01000000: state_string = "Q1";
+			8'b00100000: state_string = "Q2";
+			8'b00010000: state_string = "Q3";
+			8'b00001000: state_string = "Q4";
+			8'b00000100: state_string = "Q5";
+			8'b00000010: state_string = "Q6";
+			8'b00000001: state_string = "QD";
 		endcase
 	end
 	
@@ -158,7 +162,7 @@ module wordle_top (
 					else begin //if the letter is not a match, the color block is white 
 						color_array[0][i] <= 3'b111; 
 					end
-				k = k - 8; 
+				k = k - 8; // MIGHT CAUSE TIMING ERROR SINCE ITS COMBINATIONAL, FOR LOOP MIGHT NOT PROCESS IN PARALLEL
 				end
 			end
 			7'b0010000: begin //second guess
@@ -294,14 +298,44 @@ module wordle_top (
 			      ((CounterX>496&&CounterX<536) ? 9: 
 			       ((CounterX>544&&CounterX<588) ? 10: 0))))))))); 
 		
-	always @(posedge clk) begin
-		vga_r <= (color_array[row][column][2] & inDisplayArea) || (color_array_kb[row_kb][column_kb][2] & inDisplayArea);
-		vga_g <= (color_array[row][column][1] & inDisplayArea) || (color_array_kb[row_kb][column_kb][1] & inDisplayArea);
-		vga_b <= (color_array[row][column][0] & inDisplayArea) || (color_array_kb[row_kb][column_kb][0] & inDisplayArea);
+	always @(posedge board_clk) begin
+		// update vga_r, vga_g, and vga_b to display letters and blocks
+		vga_r <= ~vga_letters[CounterY[9:2]][CounterX[9:2]] && ((color_array[row][column][2] & inDisplayArea) || (color_array_kb[row_kb][column_kb][2] & inDisplayArea));
+		vga_g <= ~vga_letters[CounterY[9:2]][CounterX[9:2]] && ((color_array[row][column][1] & inDisplayArea) || (color_array_kb[row_kb][column_kb][1] & inDisplayArea));
+		vga_b <= ~vga_letters[CounterY[9:2]][CounterX[9:2]] && ((color_array[row][column][0] & inDisplayArea) || (color_array_kb[row_kb][column_kb][0] & inDisplayArea));
 	end
 	
-	//TODO: change tile color for selected letter
+	always @( col_curr, row_curr ) begin
+		integer r,c;
+		for (r=0; r<3; r=r+1) begin
+	   		for (c=0; c<10; c=r+1) begin
+	   			color_array_kb[r][c] <= 3'b111;
+	   		end
+	   	end
+		color_array_kb[row_kb][column_kb] <= 3'b001;
+	end
 	
+	always @( negedge reset ) begin
+		// reset color_array, color_array_kb, history, so screen displays on repeat
+		history[0] <= "     ";
+		history[1] <= "     ";
+		history[2] <= "     ";
+		history[3] <= "     ";
+		history[4] <= "     ";
+
+		integer r,c;
+		for (r=0; r<6; r=r+1) begin
+	   		for (c=0; c<5; c=r+1) begin
+	   			color_array[r][c] <= 3'b111;
+	   		end
+	   	end
+	   	for (r=0; r<3; r=r+1) begin
+	   		for (c=0; c<10; c=r+1) begin
+	   			color_array_kb[r][c] <= 3'b111;
+	   		end
+	   	end
+	end
+
 endmodule
 
 
