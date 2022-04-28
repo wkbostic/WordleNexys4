@@ -107,7 +107,7 @@ module wordle_top (
 	wordle_sm SM1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .C(C), .curr_letter(curr_letter), .q_I(q_I), 
 		      .q_1G(q_1G), .q_2G(q_2G), .q_3G(q_3G), .q_4G(q_4G), .q_5G(q_5G), .q_6G(q_6G), .q_Done(q_Done), .win(win), .lose(lose), .randomWord(randomWord), .I(I), 
 		      .first_letter(first_letter), .second_letter(second_letter), .third_letter(third_letter), .fourth_letter(fourth_letter), .fifth_letter(fifth_letter),
-		      .vga_letters);	
+		      .vga_letters(vga_letters), .curr_letter(curr_letter));	
 	
 	wordle_keyboard KB1(.Clk(sys_clk), .reset(reset), .Start(Start_Ack_SCEN), .Ack(Start_Ack_SCEN), .U(U), .D(D), .L(L), .R(R), 
 			    .q_I(q_IKB), .q_Run(q_Run), .q_Done(q_DoneKB), .curr_letter(curr_letter), .col_curr(col_curr), .row_curr(row_curr));
@@ -300,9 +300,9 @@ module wordle_top (
 		
 	always @(posedge board_clk) begin
 		// update vga_r, vga_g, and vga_b to display letters and blocks
-		vga_r <= ~vga_letters[CounterY[9:2]][CounterX[9:2]] && ((color_array[row][column][2] & inDisplayArea) || (color_array_kb[row_kb][column_kb][2] & inDisplayArea));
-		vga_g <= ~vga_letters[CounterY[9:2]][CounterX[9:2]] && ((color_array[row][column][1] & inDisplayArea) || (color_array_kb[row_kb][column_kb][1] & inDisplayArea));
-		vga_b <= ~vga_letters[CounterY[9:2]][CounterX[9:2]] && ((color_array[row][column][0] & inDisplayArea) || (color_array_kb[row_kb][column_kb][0] & inDisplayArea));
+		vga_r <= ~vga_letters[CounterY[9:2]-1'd1][CounterX[9:2]-2'd28] && ((color_array[row][column][2] & inDisplayArea) || (color_array_kb[row_kb][column_kb][2] & inDisplayArea));
+		vga_g <= ~vga_letters[CounterY[9:2]-1'd1][CounterX[9:2]-2'd28] && ((color_array[row][column][1] & inDisplayArea) || (color_array_kb[row_kb][column_kb][1] & inDisplayArea));
+		vga_b <= ~vga_letters[CounterY[9:2]-1'd1][CounterX[9:2]-2'd28] && ((color_array[row][column][0] & inDisplayArea) || (color_array_kb[row_kb][column_kb][0] & inDisplayArea));
 	end
 	
 	always @( col_curr, row_curr ) begin

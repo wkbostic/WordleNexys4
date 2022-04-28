@@ -8,7 +8,7 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done
 	input done;  
 	
 	/*  OUTPUTS */
-    output curr_letter;
+    output wire [7:0] curr_letter;
 	// store current state
 	output q_I, q_Run, q_Done;
 	reg[2:0] state; 
@@ -20,8 +20,8 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done
 	   QRUN = 3'b010,
 	   QDONE = 3'b001;
     
-	output [4:0] col_curr;
-    output [1:0] row_curr;
+	output reg [4:0] col_curr;
+    output reg [1:0] row_curr;
     
     // Create keyboard arrangement as a localparam
     localparam keyboard = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -38,6 +38,8 @@ module wordle_keyboard(Clk, reset, Start, Ack, U, D, L, R, C, q_I, q_Run, q_Done
                QI: 
                    if(Start)
                        state <= QRUN;
+                       col <= 5'b00000;
+                       row <= 2'b00;
                QRUN: 
                    begin
 		    if(done)
